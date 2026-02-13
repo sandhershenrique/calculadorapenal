@@ -1,0 +1,227 @@
+/* =========================================
+   SISTEMA PENAL - VISUAL INSTITUCIONAL NEUTRO
+   COM CAIXA DE ORGANIZAÇÃO E RELATÓRIO EXIBIDO APENAS AO FINAL
+========================================= */
+
+/* ===== BASE ===== */
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:"Segoe UI", sans-serif;
+    background:linear-gradient(135deg,#0b0f17,#111827);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    color:#e5e7eb;
+    letter-spacing:0.3px;
+}
+
+/* ===== HEADER ===== */
+
+.logo{
+    width:70px;
+    margin-top:25px;
+    filter: drop-shadow(0 0 6px rgba(0,0,0,0.6));
+}
+
+h1{
+    text-align:center;
+    margin:12px 0 25px 0;
+    font-size:26px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    color:#3b82f6;
+}
+
+/* ===== PAINEL ===== */
+
+.container{
+    width:95vw;
+    height:85vh;
+    background:#111827;
+    border-radius:10px;
+    padding:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto 1fr auto;
+    gap:15px;
+    border:1px solid #1f2937;
+    box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* ===== INPUTS ===== */
+
+input, select, textarea{
+    background:#0f172a;
+    border:1px solid #334155;
+    color:#f1f5f9;
+    padding:10px;
+    border-radius:6px;
+    font-size:14px;
+    transition:0.2s;
+}
+
+input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 6px rgba(59,130,246,0.4);
+}
+
+/* ===== BLOCO CRIMES ===== */
+
+#crimesContainer{
+    background:#0f172a;
+    border-radius:6px;
+    padding:10px;
+    overflow-y:auto;
+    max-height:100%;
+    border:1px solid #1e293b;
+}
+
+/* Scroll discreto */
+#crimesContainer::-webkit-scrollbar{
+    width:6px;
+}
+
+#crimesContainer::-webkit-scrollbar-thumb{
+    background:#334155;
+    border-radius:6px;
+}
+
+/* ===== CATEGORIAS ===== */
+
+.categoria{
+    background:#111c2f;
+    padding:8px;
+    border-radius:6px;
+    margin-bottom:10px;
+    border-left:4px solid #3b82f6;
+}
+
+.categoria h3{
+    color:#60a5fa;
+    margin-bottom:5px;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.crime{
+    padding:6px;
+    border-bottom:1px solid #1f2937;
+    display:flex;
+    align-items:center;
+    font-size:13px;
+}
+
+.crime:last-child{
+    border-bottom:none;
+}
+
+.crime input[type="checkbox"]{
+    transform:scale(1.1);
+    margin-right:10px;
+    accent-color:#3b82f6;
+}
+
+/* ===== REDUÇÃO ===== */
+
+.reducao{
+    background:#0f172a;
+    padding:12px;
+    border-radius:6px;
+    border-left:4px solid #facc15;
+    border:1px solid #1e293b;
+}
+
+/* ===== TOTAL ===== */
+
+.total{
+    background:#0f172a;
+    padding:12px;
+    border-radius:6px;
+    border:1px solid #1e293b;
+    font-weight:600;
+}
+
+/* ===== BOTÃO ===== */
+
+button{
+    background:#3b82f6;
+    border:none;
+    padding:12px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+    color:#fff;
+    transition:0.2s;
+}
+
+button:hover{
+    background:#2563eb;
+}
+
+/* ===== TEXTAREA ===== */
+
+textarea{
+    resize:none;
+}
+
+/* ===== ORGANIZAÇÃO - AGRUPAR LABEL + SELECT ===== */
+
+label[for="organizacao"]{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:#60a5fa;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:0;
+    padding:12px 12px 0 12px;
+    border:1px solid #1e293b;
+    border-radius:6px 6px 0 0;
+    background:#0f172a;
+}
+
+#organizacao{
+    display:block;
+    width:100%;
+    background:#0f172a;
+    border:1px solid #1e293b;
+    border-top:none;
+    border-radius:0 0 6px 6px;
+    padding:12px;
+    color:#f1f5f9;
+    font-size:14px;
+}
+
+/* ===== RELATÓRIO FINAL - APARECE AO FINAL ===== */
+
+#resultadoFinal{
+    margin-top:20px;
+    padding:30px;
+    width:95vw;
+    max-width:1000px;
+    border-radius:6px;
+    background:#1f2937; /* neutro, combina com o painel */
+    color:#f1f5f9;
+    font-family:"Segoe UI", sans-serif;
+    border:1px solid #334155;
+    box-shadow:0 8px 25px rgba(0,0,0,0.6);
+    display:none; /* invisível até clicar "Aplicar Pena" */
+    animation:slideDown 0.4s ease;
+}
+
+/* ===== CLASSE PARA MOSTRAR RELATÓRIO ===== */
+
+#resultadoFinal.ativo{
+    display:block;
+}
+
+/* ===== ANIMAÇÃO SLIDE ===== */
+@keyframes slideDown{
+    from{opacity:0; transform:translateY(-15px);}
+    to{opacity:1; transform:translateY(0);}
+}
