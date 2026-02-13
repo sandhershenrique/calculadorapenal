@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>CALCULADORA PENAL</title>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f0f0f;
+    color:#fff;
+    padding:20px;
+}
+h1{
+    text-align:center;
+    color:#ff0000;
+}
+.logo{
+    width:70px;
+    display:block;
+    margin:auto;
+}
+.container{
+    max-width:900px;
+    margin:auto;
+    background:#1b1b1b;
+    padding:20px;
+    border-radius:10px;
+}
+input, textarea{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:6px;
+    border:none;
+}
+.categoria{
+    margin-top:20px;
+    padding:10px;
+    border:1px solid #333;
+    border-radius:8px;
+}
+.categoria h3{
+    color:#ff3c3c;
+}
+.crime{
+    padding:5px 0;
+    border-bottom:1px solid #333;
+}
+.total{
+    margin-top:20px;
+    font-size:18px;
+}
+button{
+    background:#ff0000;
+    color:#fff;
+    border:none;
+    padding:12px;
+    width:100%;
+    margin-top:15px;
+    border-radius:6px;
+    cursor:pointer;
+}
+.reducao{
+    background:#111;
+    margin-top:20px;
+    padding:15px;
+    border-radius:8px;
+}
+#resultadoFinal{
+    margin-top:30px;
+    padding:25px;
+    background:#ffffff;
+    color:#000;
+    display:none;
+    border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<img src="foto.png" class="logo">
+<h1>CALCULADORA PENAL</h1>
+
+<div class="container">
+
+<input id="policial" placeholder="Nome do Policial">
+<input id="idpolicial" placeholder="Passaporte do Policial (ID)">
+<input id="suspeito" placeholder="Nome do Infrator">
+<input id="idsuspeito" placeholder="Passaporte do Infrator (ID)">
+
+<div id="crimesContainer"></div>
+
+<div class="reducao">
+<h3>FINALIZAÇÃO - REDUÇÕES DE PENA</h3>
+
+<label>Réu primário:
+<input type="checkbox" name="reu" value="sim" onclick="unico(this);calcular()"> SIM
+<input type="checkbox" name="reu" value="nao" onclick="unico(this);calcular()"> NÃO
+</label><br>
+
+<label>Bom comportamento:
+<input type="checkbox" name="bom" value="sim" onclick="unico(this);calcular()"> SIM
+<input type="checkbox" name="bom" value="nao" onclick="unico(this);calcular()"> NÃO
+</label><br>
+
+<label>Ficha limpa:
+<input type="checkbox" name="ficha" value="sim" onclick="unico(this);calcular()"> SIM
+<input type="checkbox" name="ficha" value="nao" onclick="unico(this);calcular()"> NÃO
+</label>
+
+</div>
+
+<div class="total">
+Meses Totais: <span id="meses">0</span><br>
+Multa Total: $<span id="multa">0</span><br>
+Fiança Total: $<span id="fianca">0</span><br>
+Total Geral (Multa + Fiança): $<span id="total">0</span>
+</div>
+
+<textarea id="obs" placeholder="Observações do policial..."></textarea>
+
+<button onclick="gerarRelatorio()">APLICAR PENA</button>
+
+<div id="resultadoFinal">
+<img src="foto.png" class="logo">
+<h2 style="text-align:center;">RELATÓRIO PENAL</h2>
+
+<div id="dados"></div>
+<hr>
+<div id="listaCrimes"></div>
+<hr>
+<div id="observacaoFinal"></div>
+
+</div>
+
+<button onclick="baixarImagem()">BAIXAR DOCUMENTO</button>
+
+</div>
+
+<script>
+
+// ===== LISTA DE CRIMES =====
+const categorias = [
+{
+titulo:"ITENS ILEGAIS – ART. 2º",
+dados:[
+{num:"2.2", nome:"Drogas uso próprio", meses:0, multa:6250, fianca:0},
+{num:"2.3", nome:"Dinheiro sujo < 100k", meses:0, multa:6250, fianca:0},
+{num:"2.4", nome:"Algemas/capuz/keycard", meses:6, multa:6250, fianca:6250},
+{num:"2.5", nome:"Masterpick/lockpick", meses:6, multa:6250, fianca:6250},
+{num:"2.6", nome:"Colete balístico", meses:13, multa:12500, fianca:12500},
+{num:"2.7", nome:"Veículo clonado", meses:13, multa:12500, fianca:12500},
+{num:"2.8", nome:"Dinheiro sujo ≥100k", meses:13, multa:12500, fianca:12500},
+{num:"2.9", nome:"Itens ilegais", meses:19, multa:18750, fianca:18750},
+{num:"2.10", nome:"Tráfico de drogas", meses:19, multa:18750, fianca:18750},
+{num:"2.11", nome:"Munição ilegal", meses:19, multa:18750, fianca:18750}
+]
+},
+{
+titulo:"CRIMES DE TRÂNSITO – ART. 1º",
+dados:[
+{num:"1.1", nome:"Alta velocidade", meses:0, multa:3125, fianca:0},
+{num:"1.2", nome:"Estacionar proibido", meses:0, multa:12500, fianca:0},
+{num:"1.3", nome:"Abandono veículo", meses:0, multa:12500, fianca:0},
+{num:"1.4", nome:"Fila dupla", meses:0, multa:12500, fianca:0},
+{num:"1.5", nome:"Som alto", meses:0, multa:12500, fianca:0},
+{num:"1.6", nome:"Bloquear via", meses:0, multa:12500, fianca:0},
+{num:"1.7", nome:"Manobras perigosas", meses:6, multa:12500, fianca:12500},
+{num:"1.8", nome:"Direção perigosa", meses:6, multa:12500, fianca:12500},
+{num:"1.9", nome:"Dirigir sob efeito", meses:6, multa:12500, fianca:12500}
+]
+},
+{
+titulo:"CRIMES INAFIANÇÁVEIS – ART. 4º",
+dados:[
+{num:"4.1", nome:"Sequestro", meses:50, multa:50000, fianca:50000},
+{num:"4.2", nome:"Porte arma alto calibre", meses:50, multa:50000, fianca:50000},
+{num:"4.3", nome:"Tráfico de armas", meses:50, multa:50000, fianca:50000},
+{num:"4.4", nome:"Tráfico de munições", meses:50, multa:50000, fianca:50000},
+{num:"4.5", nome:"Desacato servidor público", meses:50, multa:50000, fianca:50000},
+{num:"4.6", nome:"Abuso de poder", meses:63, multa:62500, fianca:62500},
+{num:"4.7", nome:"Assalto banco/joalheria", meses:75, multa:75000, fianca:75000},
+{num:"4.8", nome:"Corrupção passiva", meses:75, multa:75000, fianca:75000},
+{num:"4.9", nome:"Latrocínio", meses:75, multa:75000, fianca:75000},
+{num:"4.10", nome:"Homicídio doloso", meses:75, multa:75000, fianca:75000}
+]
+}
+];
+
+// montar lista
+const div = document.getElementById("crimesContainer");
+categorias.forEach((cat,ci)=>{
+let html=`<div class="categoria"><h3>${cat.titulo}</h3>`;
+cat.dados.forEach((c,i)=>{
+html+=`<div class="crime">
+<input type="checkbox" onchange="calcular()" data-cat="${ci}" data-i="${i}">
+${c.num} - ${c.nome} (${c.meses} meses)
+</div>`;
+});
+html+="</div>";
+div.innerHTML+=html;
+});
+
+function unico(el){
+document.getElementsByName(el.name).forEach(x=>{if(x!=el)x.checked=false});
+}
+
+function calcular(){
+let meses=0,multa=0,fianca=0;
+
+document.querySelectorAll('#crimesContainer input:checked').forEach(el=>{
+let c=categorias[el.dataset.cat].dados[el.dataset.i];
+meses+=c.meses;
+multa+=c.multa;
+fianca+=c.fianca;
+});
+
+let red=0;
+if(document.querySelector('[name=reu][value=sim]')?.checked) red+=0.05;
+if(document.querySelector('[name=bom][value=sim]')?.checked) red+=0.10;
+if(document.querySelector('[name=ficha][value=sim]')?.checked) red+=0.05;
+
+meses=Math.round(meses-(meses*red));
+
+mesesEl.innerText=meses;
+multaEl.innerText=multa;
+fiancaEl.innerText=fianca;
+totalEl.innerText=multa+fianca;
+}
+
+const mesesEl=document.getElementById("meses");
+const multaEl=document.getElementById("multa");
+const fiancaEl=document.getElementById("fianca");
+const totalEl=document.getElementById("total");
+
+function gerarRelatorio(){
+let p=policial.value;
+let pid=idpolicial.value;
+let s=suspeito.value;
+let sid=idsuspeito.value;
+
+let lista="";
+document.querySelectorAll('#crimesContainer input:checked').forEach(el=>{
+let c=categorias[el.dataset.cat].dados[el.dataset.i];
+lista+=`${c.num} - ${c.nome} (${c.meses} meses)<br>`;
+});
+
+dados.innerHTML=`
+<b>Nome do Policial:</b> ${p}<br>
+<b>Passaporte:</b> ${pid}<br><br>
+
+<b>Nome do Infrator:</b> ${s}<br>
+<b>Passaporte do Infrator:</b> ${sid}<br><br>
+
+<b>Meses de Prisão:</b> ${mesesEl.innerText}<br>
+<b>Multa:</b> $${multaEl.innerText}<br>
+<b>Fiança:</b> $${fiancaEl.innerText}<br>
+<b>Total Geral:</b> $${totalEl.innerText}
+`;
+
+listaCrimes.innerHTML=lista;
+observacaoFinal.innerHTML="<b>Observações:</b> "+obs.value;
+
+resultadoFinal.style.display="block";
+}
+
+function baixarImagem(){
+html2canvas(document.getElementById("resultadoFinal")).then(canvas=>{
+let link=document.createElement("a");
+link.download=suspeito.value+"_"+idsuspeito.value+".png";
+link.href=canvas.toDataURL();
+link.click();
+});
+}
+
+</script>
+
+</body>
+</html>
