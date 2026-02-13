@@ -2,51 +2,186 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>CALCULADORA PENAL</title>
-<link rel="stylesheet" href="style.css">
+<title>Calculadora Penal - Sistema Oficial</title>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+body{
+    margin:0;
+    font-family:"Segoe UI", sans-serif;
+    background:linear-gradient(135deg,#0b0f17,#111827);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    color:#e5e7eb;
+}
+/* =========================
+   TÍTULO COM LOGO
+========================= */
+h1{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    font-size:28px;
+    color:#3b82f6;
+    text-align:center;
+    letter-spacing:2px;
+    margin:20px 0;
+}
+h1 img{
+    width:60px;
+    height:60px;
+}
+
+input, select, textarea{
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    border-radius:6px;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:#f1f5f9;
+    font-size:14px;
+}
+#crimesContainer{
+    background:#0f172a;
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #1e293b;
+    max-height:200px;
+    overflow-y:auto;
+}
+.categoria{
+    background:#111c2f;
+    padding:8px;
+    margin-bottom:10px;
+    border-left:4px solid #3b82f6;
+}
+.categoria h3{color:#60a5fa; font-size:14px;}
+.crime{padding:6px; border-bottom:1px solid #1f2937;}
+.crime:last-child{border-bottom:none;}
+.crime input[type="checkbox"]{margin-right:10px; accent-color:#3b82f6; transform:scale(1.1);}
+.reducao, .total{background:#0f172a; padding:12px; border-radius:6px; border:1px solid #1e293b; margin-top:10px;}
+button{
+    background:#3b82f6; border:none; padding:12px; border-radius:6px;
+    color:#fff; font-weight:600; cursor:pointer; transition:0.2s;
+}
+button:hover{background:#2563eb;}
+textarea{resize:none;}
+#confirmBox{
+    display:none;
+    background:#22c55e;
+    color:#fff;
+    font-weight:bold;
+    padding:15px 25px;
+    border-radius:6px;
+    margin-top:20px;
+    font-size:18px;
+}
+/* =========================
+   NOVO ESTILO CHECKBOX ALINHADO
+========================= */
+.check-group {
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:15px;
+    margin:8px 0;
+    flex-wrap:nowrap;
+}
+.check-group span {
+    width:150px;
+    font-weight:500;
+    color:#f1f5f9;
+    text-align:right;
+}
+.check-group label {
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+/* =========================
+   MODAL RELATÓRIO
+========================= */
+#modalOverlay{
+    position:fixed;
+    top:0; left:0;
+    width:100vw; height:100vh;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+#resultadoFinal{
+    width:800px;
+    max-width:95%;
+    background:#fefefe;
+    color:#111;
+    border-radius:10px;
+    padding:30px;
+    position:relative;
+    box-shadow:0 0 30px rgba(0,0,0,0.6);
+    font-family: "Times New Roman", serif;
+}
+#resultadoFinal .closeBtn{
+    position:absolute;
+    top:10px;
+    right:15px;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+    color:#333;
+}
+.relatorio-header{display:flex; align-items:center; margin-bottom:20px;}
+.relatorio-header img{width:80px; margin-right:20px;}
+.relatorio-titulo{font-size:26px; font-weight:bold; color:#111;}
+.subtitulo{font-size:14px; color:#555;}
+.bloco{margin-top:15px;}
+.bloco h3{color:#111; border-bottom:1px solid #333; padding-bottom:5px;}
+.linha{margin:5px 0; font-size:14px;}
+.totalBox{font-weight:bold;}
+</style>
 </head>
 <body>
 
-<img src="foto.png" class="logo">
-<h1>CALCULADORA PENAL</h1>
+<h1>
+  <img src="foto.png" alt="Logo Polícia">
+  CALCULADORA PENAL
+</h1>
 
-<div class="container">
-
+<div class="container" style="width:95vw; max-width:1000px; display:grid; grid-template-columns:1fr 1fr; gap:15px;">
 <input id="policial" placeholder="Nome do Policial">
 <input id="idpolicial" placeholder="Passaporte do Policial (ID)">
 <input id="suspeito" placeholder="Nome do Infrator">
 <input id="idsuspeito" placeholder="Passaporte do Infrator (ID)">
-
-<label class="label-org">A qual organização você participa?</label>
-<select id="organizacao" class="select-org">
+<label>A qual organização você participa?</label>
+<select id="organizacao">
 <option value="POLÍCIA CIVIL">POLÍCIA CIVIL</option>
 <option value="POLÍCIA MILITAR">POLÍCIA MILITAR</option>
 <option value="RONE">RONE</option>
 <option value="POLÍCIA RODOVIÁRIA FEDERAL">POLÍCIA RODOVIÁRIA FEDERAL</option>
 <option value="POLÍCIA FEDERAL">POLÍCIA FEDERAL</option>
 </select>
-
 <div id="crimesContainer"></div>
 
 <div class="reducao">
-<h3>FINALIZAÇÃO - REDUÇÕES DE PENA</h3>
-
-<label>Réu primário:
-<input type="checkbox" name="reu" value="sim" onclick="unico(this);calcular()"> SIM
-<input type="checkbox" name="reu" value="nao" onclick="unico(this);calcular()"> NÃO
-</label><br>
-
-<label>Bom comportamento:
-<input type="checkbox" name="bom" value="sim" onclick="unico(this);calcular()"> SIM
-<input type="checkbox" name="bom" value="nao" onclick="unico(this);calcular()"> NÃO
-</label><br>
-
-<label>Ficha limpa:
-<input type="checkbox" name="ficha" value="sim" onclick="unico(this);calcular()"> SIM
-<input type="checkbox" name="ficha" value="nao" onclick="unico(this);calcular()"> NÃO
-</label>
-
+  <h3>FINALIZAÇÃO - REDUÇÕES DE PENA</h3>
+  <div class="check-group">
+    <span>Réu primário:</span>
+    <label><input type="checkbox" name="reu" value="sim" onclick="unico(this);calcular()"> SIM</label>
+    <label><input type="checkbox" name="reu" value="nao" onclick="unico(this);calcular()"> NÃO</label>
+  </div>
+  <div class="check-group">
+    <span>Bom comportamento:</span>
+    <label><input type="checkbox" name="bom" value="sim" onclick="unico(this);calcular()"> SIM</label>
+    <label><input type="checkbox" name="bom" value="nao" onclick="unico(this);calcular()"> NÃO</label>
+  </div>
+  <div class="check-group">
+    <span>Ficha limpa:</span>
+    <label><input type="checkbox" name="ficha" value="sim" onclick="unico(this);calcular()"> SIM</label>
+    <label><input type="checkbox" name="ficha" value="nao" onclick="unico(this);calcular()"> NÃO</label>
+  </div>
 </div>
 
 <div class="total">
@@ -57,224 +192,155 @@ Total Geral: $<span id="total">0</span>
 </div>
 
 <textarea id="obs" placeholder="Observações do policial..."></textarea>
-
 <button id="btnAplicar" onclick="gerarRelatorio()">APLICAR PENA</button>
+<div id="confirmBox">CONFIRMADO</div>
 
-<div id="resultadoFinal">
-
-<div class="relatorio-header">
-<img src="foto.png" class="logo">
-<div class="relatorio-titulo">RELATÓRIO PENAL OFICIAL</div>
-<div class="subtitulo">Departamento de Polícia - Sistema Judicial</div>
-</div>
-
-<div id="dados" class="bloco"></div>
-
-<div class="bloco">
-<h3>Infrações Registradas</h3>
-<div id="listaCrimes"></div>
-</div>
-
-<div class="bloco">
-<h3>Observações do Policial</h3>
-<div id="observacaoFinal"></div>
-</div>
-
+<!-- MODAL RELATÓRIO -->
+<div id="modalOverlay">
+    <div id="resultadoFinal">
+        <span class="closeBtn" onclick="document.getElementById('modalOverlay').style.display='none'">&times;</span>
+        <div class="relatorio-header">
+            <img src="foto.png" alt="Logo Polícia">
+            <div>
+                <div class="relatorio-titulo">RELATÓRIO PENAL OFICIAL</div>
+                <div class="subtitulo">Departamento de Polícia - Sistema Judicial</div>
+            </div>
+        </div>
+        <div id="dados" class="bloco"></div>
+        <div class="bloco">
+            <h3>Infrações Registradas</h3>
+            <div id="listaCrimes"></div>
+        </div>
+        <div class="bloco">
+            <h3>Observações do Policial</h3>
+            <div id="observacaoFinal"></div>
+        </div>
+        <div class="bloco" id="protocoloBloco">
+            <h3>Protocolo e Data</h3>
+            <div id="protocolo"></div>
+            <div id="dataHora"></div>
+        </div>
+    </div>
 </div>
 
 <script>
-/* ===========================
-   CONFIGURAÇÕES
-=========================== */
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1471684006901842001/vQFiUpag8t2xCAR7pzx0Al_gepXby2ZrY3p1jeVDSAhUynfXwxOE36l7guhsYwO1g0yc";
 
-/* ===========================
-   FUNÇÕES AUXILIARES
-=========================== */
-function gerarID() { return "REL-" + Date.now(); }
-function agora() { return new Date().toLocaleString("pt-BR"); }
-
-/* ===========================
-   CATEGORIAS DE CRIMES
-=========================== */
 const categorias = [
-    {
-        titulo:"ITENS ILEGAIS – ART. 2º",
-        dados:[
-            {num:"2.2", nome:"Drogas uso próprio", meses:0, multa:6250, fianca:0},
-            {num:"2.3", nome:"Dinheiro sujo < 100k", meses:0, multa:6250, fianca:0},
-            {num:"2.4", nome:"Algemas/capuz/keycard", meses:6, multa:6250, fianca:6250},
-            {num:"2.5", nome:"Masterpick/lockpick", meses:6, multa:6250, fianca:6250},
-            {num:"2.6", nome:"Colete balístico", meses:13, multa:12500, fianca:12500},
-            {num:"2.7", nome:"Veículo clonado", meses:13, multa:12500, fianca:12500},
-            {num:"2.8", nome:"Dinheiro sujo ≥100k", meses:13, multa:12500, fianca:12500},
-            {num:"2.9", nome:"Itens ilegais", meses:19, multa:18750, fianca:18750},
-            {num:"2.10", nome:"Tráfico de drogas", meses:19, multa:18750, fianca:18750},
-            {num:"2.11", nome:"Munição ilegal", meses:19, multa:18750, fianca:18750}
-        ]
-    },
-    {
-        titulo:"CRIMES DE TRÂNSITO – ART. 1º",
-        dados:[
-            {num:"1.1", nome:"Alta velocidade", meses:0, multa:3125, fianca:0},
-            {num:"1.2", nome:"Estacionar proibido", meses:0, multa:12500, fianca:0},
-            {num:"1.3", nome:"Abandono veículo", meses:0, multa:12500, fianca:0},
-            {num:"1.4", nome:"Fila dupla", meses:0, multa:12500, fianca:0},
-            {num:"1.5", nome:"Som alto", meses:0, multa:12500, fianca:0},
-            {num:"1.6", nome:"Bloquear via", meses:0, multa:12500, fianca:0},
-            {num:"1.7", nome:"Manobras perigosas", meses:6, multa:12500, fianca:12500},
-            {num:"1.8", nome:"Direção perigosa", meses:6, multa:12500, fianca:12500},
-            {num:"1.9", nome:"Dirigir sob efeito", meses:6, multa:12500, fianca:12500}
-        ]
-    },
-    {
-        titulo:"CRIMES INAFIANÇÁVEIS – ART. 4º",
-        dados:[
-            {num:"4.1", nome:"Sequestro", meses:50, multa:50000, fianca:50000},
-            {num:"4.2", nome:"Porte arma alto calibre", meses:50, multa:50000, fianca:50000},
-            {num:"4.3", nome:"Tráfico de armas", meses:50, multa:50000, fianca:50000},
-            {num:"4.4", nome:"Tráfico de munições", meses:50, multa:50000, fianca:50000},
-            {num:"4.5", nome:"Desacato servidor público", meses:50, multa:50000, fianca:50000},
-            {num:"4.6", nome:"Abuso de poder", meses:63, multa:62500, fianca:62500},
-            {num:"4.7", nome:"Assalto banco/joalheria", meses:75, multa:75000, fianca:75000},
-            {num:"4.8", nome:"Corrupção passiva", meses:75, multa:75000, fianca:75000},
-            {num:"4.9", nome:"Latrocínio", meses:75, multa:75000, fianca:75000},
-            {num:"4.10", nome:"Homicídio doloso", meses:75, multa:75000, fianca:75000}
-        ]
-    }
+  {titulo:"ITENS ILEGAIS – ART. 2º", dados:[
+      {num:"2.2", nome:"Drogas uso próprio", meses:0, multa:6250, fianca:0},
+      {num:"2.3", nome:"Dinheiro sujo < 100k", meses:0, multa:6250, fianca:0},
+      {num:"2.4", nome:"Algemas/capuz/keycard", meses:6, multa:6250, fianca:6250},
+      {num:"2.5", nome:"Masterpick/lockpick", meses:6, multa:6250, fianca:6250},
+      {num:"2.6", nome:"Colete balístico", meses:13, multa:12500, fianca:12500},
+      {num:"2.7", nome:"Veículo clonado", meses:13, multa:12500, fianca:12500},
+      {num:"2.8", nome:"Dinheiro sujo ≥100k", meses:13, multa:12500, fianca:12500},
+      {num:"2.9", nome:"Itens ilegais", meses:19, multa:18750, fianca:18750},
+      {num:"2.10", nome:"Tráfico de drogas", meses:19, multa:18750, fianca:18750},
+      {num:"2.11", nome:"Munição ilegal", meses:19, multa:18750, fianca:18750}
+  ]},
+  {titulo:"CRIMES DE TRÂNSITO – ART. 1º", dados:[
+      {num:"1.1", nome:"Alta velocidade", meses:0, multa:3125, fianca:0},
+      {num:"1.2", nome:"Estacionar proibido", meses:0, multa:12500, fianca:0},
+      {num:"1.3", nome:"Abandono veículo", meses:0, multa:12500, fianca:0},
+      {num:"1.4", nome:"Fila dupla", meses:0, multa:12500, fianca:0},
+      {num:"1.5", nome:"Som alto", meses:0, multa:12500, fianca:0},
+      {num:"1.6", nome:"Bloquear via", meses:0, multa:12500, fianca:0},
+      {num:"1.7", nome:"Manobras perigosas", meses:6, multa:12500, fianca:12500},
+      {num:"1.8", nome:"Direção perigosa", meses:6, multa:12500, fianca:12500},
+      {num:"1.9", nome:"Dirigir sob efeito", meses:6, multa:12500, fianca:12500}
+  ]},
+  {titulo:"CRIMES INAFIANÇÁVEIS – ART. 4º", dados:[
+      {num:"4.1", nome:"Sequestro", meses:50, multa:50000, fianca:50000},
+      {num:"4.2", nome:"Porte arma alto calibre", meses:50, multa:50000, fianca:50000},
+      {num:"4.3", nome:"Tráfico de armas", meses:50, multa:50000, fianca:50000},
+      {num:"4.4", nome:"Tráfico de munições", meses:50, multa:50000, fianca:50000},
+      {num:"4.5", nome:"Desacato servidor público", meses:50, multa:50000, fianca:50000},
+      {num:"4.6", nome:"Abuso de poder", meses:63, multa:62500, fianca:62500},
+      {num:"4.7", nome:"Assalto banco/joalheria", meses:75, multa:75000, fianca:75000},
+      {num:"4.8", nome:"Corrupção passiva", meses:75, multa:75000, fianca:75000},
+      {num:"4.9", nome:"Latrocínio", meses:75, multa:75000, fianca:75000},
+      {num:"4.10", nome:"Homicídio doloso", meses:75, multa:75000, fianca:75000}
+  ]}
 ];
 
-/* ===========================
-   GERAR CHECKBOXES
-=========================== */
-const div = document.getElementById("crimesContainer");
-categorias.forEach((cat, ci) => {
-    let html = `<div class="categoria"><h3>${cat.titulo}</h3>`;
-    cat.dados.forEach((c,i) => {
-        html += `<div class="crime">
-            <input type="checkbox" onchange="calcular()" data-cat="${ci}" data-i="${i}">
-            ${c.num} - ${c.nome} (${c.meses} meses)
+const div=document.getElementById("crimesContainer");
+categorias.forEach((cat,ci)=>{
+    let html=`<div class="categoria"><h3>${cat.titulo}</h3>`;
+    cat.dados.forEach((c,i)=>{
+        html+=`<div class="crime">
+        <input type="checkbox" onchange="calcular()" data-cat="${ci}" data-i="${i}">
+        ${c.num} - ${c.nome} (${c.meses} meses)
         </div>`;
     });
-    html += "</div>";
-    div.innerHTML += html;
+    html+="</div>";
+    div.innerHTML+=html;
 });
 
-/* ===========================
-   FUNÇÃO UNICO CHECKBOX
-=========================== */
-function unico(el){
-    document.getElementsByName(el.name).forEach(x=>{if(x!=el)x.checked=false});
-}
+function unico(el){document.getElementsByName(el.name).forEach(x=>{if(x!=el)x.checked=false});}
 
-/* ===========================
-   CALCULO PENA
-=========================== */
-function calcular() {
-    let meses=0, multa=0, fianca=0;
-
-    document.querySelectorAll('#crimesContainer input:checked').forEach(el => {
-        let c = categorias[el.dataset.cat].dados[el.dataset.i];
-        meses += c.meses;
-        multa += c.multa;
-        fianca += c.fianca;
+function calcular(){
+    let meses=0,multa=0,fianca=0;
+    document.querySelectorAll('#crimesContainer input:checked').forEach(el=>{
+        let c=categorias[el.dataset.cat].dados[el.dataset.i];
+        meses+=c.meses; multa+=c.multa; fianca+=c.fianca;
     });
-
     let red=0;
     if(document.querySelector('[name=reu][value=sim]')?.checked) red+=0.05;
     if(document.querySelector('[name=bom][value=sim]')?.checked) red+=0.10;
     if(document.querySelector('[name=ficha][value=sim]')?.checked) red+=0.05;
-
-    meses = Math.round(meses - (meses * red));
-
-    document.getElementById("meses").innerText = meses;
-    document.getElementById("multa").innerText = multa;
-    document.getElementById("fianca").innerText = fianca;
-    document.getElementById("total").innerText = multa+fianca;
+    meses=Math.round(meses-(meses*red));
+    document.getElementById("meses").innerText=meses;
+    document.getElementById("multa").innerText=multa;
+    document.getElementById("fianca").innerText=fianca;
+    document.getElementById("total").innerText=multa+fianca;
 }
 
-/* ===========================
-   GERAR RELATÓRIO + ENVIAR + DOWNLOAD
-=========================== */
 function gerarRelatorio(){
-    const botao = document.getElementById("btnAplicar");
-    if(botao.disabled) return;
-    botao.disabled=true;
-    botao.innerText="PROCESSANDO...";
-
-    const idRelatorio = gerarID();
-
-    const lista = Array.from(document.querySelectorAll('#crimesContainer input:checked'))
-        .map(el => {
-            const c = categorias[el.dataset.cat].dados[el.dataset.i];
-            return `${c.num} - ${c.nome}`;
-        }).join("\n");
-
-    // Dados do relatório
-    const policial = document.getElementById("policial").value;
-    const idpolicial = document.getElementById("idpolicial").value;
-    const suspeito = document.getElementById("suspeito").value;
-    const idsuspeito = document.getElementById("idsuspeito").value;
-    const organizacao = document.getElementById("organizacao").value;
-    const observacao = document.getElementById("obs").value || "Sem observações.";
-
-    document.getElementById("listaCrimes").innerText = lista || "Nenhuma infração registrada.";
+    document.getElementById("btnAplicar").style.display="none";
+    document.getElementById("confirmBox").style.display="block";
 
     document.getElementById("dados").innerHTML = `
-        <div class="linha"><b>ID:</b> ${idRelatorio}</div>
-        <div class="linha"><b>Data/Hora:</b> ${agora()}</div>
-        <div class="linha"><b>Policial:</b> ${policial} (${idpolicial})</div>
-        <div class="linha"><b>Organização:</b> ${organizacao}</div>
-        <div class="linha"><b>Infrator:</b> ${suspeito} (${idsuspeito})</div>
-        <div class="linha totalBox"><b>Meses Totais:</b> ${document.getElementById("meses").innerText}</div>
-        <div class="linha totalBox"><b>Total Financeiro:</b> $${document.getElementById("total").innerText}</div>
-        <div class="linha selo" style="margin-top:10px; font-weight:bold; color:#facc15;">🔹 Protocolo Oficial: ${idRelatorio}</div>
+        <div class="linha"><strong>Policial:</strong> ${document.getElementById("policial").value} (${document.getElementById("idpolicial").value})</div>
+        <div class="linha"><strong>Infrator:</strong> ${document.getElementById("suspeito").value} (${document.getElementById("idsuspeito").value})</div>
+        <div class="linha"><strong>Organização:</strong> ${document.getElementById("organizacao").value}</div>
+        <div class="linha totalBox">Meses: ${document.getElementById("meses").innerText} | Multa: $${document.getElementById("multa").innerText} | Fiança: $${document.getElementById("fianca").innerText} | Total: $${document.getElementById("total").innerText}</div>
     `;
 
-    document.getElementById("observacaoFinal").innerText = observacao;
-    document.getElementById("resultadoFinal").style.display="block";
+    let lista="";
+    document.querySelectorAll('#crimesContainer input:checked').forEach(el=>{
+        let c=categorias[el.dataset.cat].dados[el.dataset.i];
+        lista+=`<div class="linha">${c.num} - ${c.nome} (${c.meses} meses)</div>`;
+    });
+    document.getElementById("listaCrimes").innerHTML = lista;
 
-    // Renderiza e envia para Discord antes do download
-    html2canvas(document.getElementById("resultadoFinal"), {scale:2}).then(canvas=>{
-        canvas.toBlob(function(blob){
-            // Envio Discord
-            const formData = new FormData();
-            formData.append("file", blob, "relatorio.png");
-            formData.append("payload_json", JSON.stringify({
-                username:"Sistema Penal",
-                embeds:[{
-                    title:"🚨 RELATÓRIO PENAL",
-                    color:16711680,
-                    fields:[
-                        {name:"ID",value:idRelatorio,inline:true},
-                        {name:"Data/Hora",value:agora(),inline:true},
-                        {name:"Policial",value:`${policial} (${idpolicial})`,inline:true},
-                        {name:"Organização",value:organizacao,inline:true},
-                        {name:"Infrator",value:`${suspeito} (${idsuspeito})`},
-                        {name:"Infrações",value:lista||"Nenhuma"},
-                        {name:"Meses",value:document.getElementById("meses").innerText,inline:true},
-                        {name:"Total",value:"$"+document.getElementById("total").innerText,inline:true}
-                    ]
-                }]
-            }));
-            fetch(DISCORD_WEBHOOK,{method:"POST",body:formData});
-        });
+    document.getElementById("observacaoFinal").innerText = document.getElementById("obs").value;
 
-        // Download automático
-        const link = document.createElement("a");
-        link.download = `${suspeito || "INDIVIDUO"}_${idsuspeito || "ID"}_relatorio.png`;
-        link.href = canvas.toDataURL("image/png");
-        document.body.appendChild(link);
+    const protocolo = "PROT-" + Math.floor(100000 + Math.random() * 900000);
+    const now = new Date();
+    const dataHora = now.toLocaleString('pt-BR', {hour12:false});
+    document.getElementById("protocolo").innerText = protocolo;
+    document.getElementById("dataHora").innerText = dataHora;
+
+    const modal = document.getElementById("modalOverlay");
+    modal.style.display = "flex";
+
+    const resultadoDiv = document.getElementById("resultadoFinal");
+
+    html2canvas(resultadoDiv).then(canvas=>{
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        const nomeArquivo = `${document.getElementById("suspeito").value}_${document.getElementById("idsuspeito").value}.png`;
+        link.download = nomeArquivo;
         link.click();
-        document.body.removeChild(link);
 
-        // Botão EFETUADO
-        botao.innerText="EFETUADO";
-        botao.style.background="#28a745";
-        botao.disabled=false;
+        fetch(DISCORD_WEBHOOK, {
+            method: "POST",
+            body: JSON.stringify({content:`Relatório Penal - ${nomeArquivo}`}),
+            headers: {"Content-Type":"application/json"}
+        });
     });
 }
 </script>
-
 </body>
 </html>
