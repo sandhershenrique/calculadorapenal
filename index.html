@@ -224,7 +224,7 @@ Total Geral: $<span id="total">0</span>
 </div>
 
 <script>
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1471684006901842001/vQFiUpag8t2xCAR7pzx0Al_gepXby2ZrY3p1jeVDSAhUynfXwxOE36l7guhsYwO1g0yc";
+const DISCORD_WEBHOOK = "COLE_SEU_WEBHOOK_AQUI";
 
 const categorias = [
   {titulo:"ITENS ILEGAIS – ART. 2º", dados:[
@@ -327,17 +327,25 @@ function gerarRelatorio(){
 
     const resultadoDiv = document.getElementById("resultadoFinal");
 
+    // Gera imagem e envia para Discord
     html2canvas(resultadoDiv).then(canvas=>{
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
         const nomeArquivo = `${document.getElementById("suspeito").value}_${document.getElementById("idsuspeito").value}.png`;
+        const dataURL = canvas.toDataURL('image/png');
+
+        // Download automático
+        const link = document.createElement('a');
+        link.href = dataURL;
         link.download = nomeArquivo;
         link.click();
 
+        // Envio da imagem para Discord
         fetch(DISCORD_WEBHOOK, {
             method: "POST",
-            body: JSON.stringify({content:`Relatório Penal - ${nomeArquivo}`}),
-            headers: {"Content-Type":"application/json"}
+            body: JSON.stringify({
+                content: `Relatório Penal - ${nomeArquivo}`,
+                embeds: [{ image: { url: dataURL } }]
+            }),
+            headers: {"Content-Type": "application/json"}
         });
     });
 }
