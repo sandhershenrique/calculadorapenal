@@ -426,22 +426,28 @@ body:formData
 
 function baixarImagem(){
 
-html2canvas(document.getElementById("resultadoFinal"),{scale:2}).then(canvas=>{
+    html2canvas(document.getElementById("resultadoFinal"),{scale:2}).then(canvas=>{
 
-let nome=suspeito.value||"INDIVIDUO";
-let id=idsuspeito.value||"ID";
+        let nome=suspeito.value||"INDIVIDUO";
+        let id=idsuspeito.value||"ID";
 
-let link=document.createElement("a");
-link.download=nome+"_"+id+"_relatorio.png";
-link.href=canvas.toDataURL("image/png");
+        let link=document.createElement("a");
+        link.download=nome+"_"+id+"_relatorio.png";
+        link.href=canvas.toDataURL("image/png");
 
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
-});
+        // Alterar o botão para EFETUADO e verde
+        const botao = document.getElementById("btnAplicar");
+        botao.innerText = "EFETUADO";
+        botao.style.background = "#28a745"; // verde
+        botao.disabled = false; // opcional: reativa para novos relatórios
+    });
 
 }
+
 
 </script>
 
