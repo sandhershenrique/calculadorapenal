@@ -4,7 +4,6 @@
 ========================================= */
 
 /* ===== BASE ===== */
-
 body{
     margin:0;
     min-height:100vh;
@@ -18,7 +17,6 @@ body{
 }
 
 /* ===== HEADER ===== */
-
 .logo{
     width:70px;
     margin-top:25px;
@@ -36,7 +34,6 @@ h1{
 }
 
 /* ===== PAINEL ===== */
-
 .container{
     width:95vw;
     height:85vh;
@@ -52,7 +49,6 @@ h1{
 }
 
 /* ===== INPUTS ===== */
-
 input, select, textarea{
     background:#0f172a;
     border:1px solid #334155;
@@ -70,7 +66,6 @@ input:focus, select:focus, textarea:focus{
 }
 
 /* ===== BLOCO CRIMES ===== */
-
 #crimesContainer{
     background:#0f172a;
     border-radius:6px;
@@ -91,7 +86,6 @@ input:focus, select:focus, textarea:focus{
 }
 
 /* ===== CATEGORIAS ===== */
-
 .categoria{
     background:#111c2f;
     padding:8px;
@@ -127,7 +121,6 @@ input:focus, select:focus, textarea:focus{
 }
 
 /* ===== REDUÇÃO ===== */
-
 .reducao{
     background:#0f172a;
     padding:12px;
@@ -137,7 +130,6 @@ input:focus, select:focus, textarea:focus{
 }
 
 /* ===== TOTAL ===== */
-
 .total{
     background:#0f172a;
     padding:12px;
@@ -147,7 +139,6 @@ input:focus, select:focus, textarea:focus{
 }
 
 /* ===== BOTÃO ===== */
-
 button{
     background:#3b82f6;
     border:none;
@@ -163,14 +154,23 @@ button:hover{
     background:#2563eb;
 }
 
-/* ===== TEXTAREA ===== */
+/* ===== BOTÃO PROCESSANDO / PROCESSADO ===== */
+button.processando {
+    background:#2563eb;
+    color:#fff;
+}
 
+button.processado {
+    background:#22c55e; /* verde */
+    color:#fff;
+}
+
+/* ===== TEXTAREA ===== */
 textarea{
     resize:none;
 }
 
 /* ===== ORGANIZAÇÃO - AGRUPAR LABEL + SELECT ===== */
-
 label[for="organizacao"]{
     display:block;
     font-size:13px;
@@ -197,8 +197,7 @@ label[for="organizacao"]{
     font-size:14px;
 }
 
-/* ===== RELATÓRIO FINAL - APARECE AO FINAL ===== */
-
+/* ===== RELATÓRIO FINAL - APARECE APÓS CLICAR ===== */
 #resultadoFinal{
     margin-top:20px;
     padding:30px;
@@ -214,8 +213,7 @@ label[for="organizacao"]{
     animation:slideDown 0.4s ease;
 }
 
-/* ===== CLASSE PARA MOSTRAR RELATORIO ===== */
-
+/* ===== CLASSE PARA MOSTRAR RELATÓRIO ===== */
 #resultadoFinal.ativo{
     display:block;
 }
