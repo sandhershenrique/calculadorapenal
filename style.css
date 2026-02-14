@@ -1,485 +1,306 @@
 /* =========================================
-   SISTEMA PENAL - VISUAL INSTITUCIONAL NEUTRO
-   DOCUMENTO OFICIAL - RESPONSIVO E ORGANIZADO
-   CHECKBOXES ALINHADOS
-   (ROBUSTO: MAIS PROFUNDIDADE EM CAMPOS E BOTÕES)
+   FUNDO - CIDADE NOTURNA REAL (IMAGEM)
 ========================================= */
 
-/* ===== BASE ===== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+body{
+    position: relative;
+    overflow: hidden;
+
+    background: 
+        linear-gradient(rgba(5,10,20,0.75), rgba(5,10,20,0.85)),
+        url("https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2000&auto=format&fit=crop");
+
+    background-size: cover;
+    background-position: center bottom;
+    background-attachment: fixed;
 }
 
-:root{
-    --bg1:#0b0f17;
-    --bg2:#111827;
-
-    --cardTop: rgba(17, 24, 39, 0.92);
-    --cardBottom: rgba(15, 23, 42, 0.78);
-
-    --fieldTop: rgba(2, 6, 23, 0.55);
-    --fieldBottom: rgba(15, 23, 42, 0.75);
-
-    --border: rgba(148, 163, 184, 0.18);
-    --borderStrong: rgba(148, 163, 184, 0.28);
-
-    --text: #e5e7eb;
-    --muted: rgba(226, 232, 240, 0.72);
-
-    --blue:#3b82f6;
-    --blue2:#2563eb;
-
-    --shadow1: 0 18px 50px rgba(0,0,0,.45);
-    --shadow2: 0 12px 26px rgba(0,0,0,.35);
-    --inner: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -10px 30px rgba(0,0,0,.25);
-}
-
-body {
-    min-height: 100vh;
-    font-family: "Segoe UI", sans-serif;
-    background:
-        radial-gradient(1200px 700px at 20% 10%, rgba(59,130,246,.18), transparent 55%),
-        radial-gradient(1000px 700px at 80% 10%, rgba(34,197,94,.10), transparent 55%),
-        linear-gradient(135deg, var(--bg1), var(--bg2));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text);
-    letter-spacing: 0.3px;
-    padding-bottom: 25px;
-}
-
-/* ===== HEADER ===== */
-.logo {
-    width: 70px;
-    margin-top: 25px;
-    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
-}
-
-h1 {
-    text-align: center;
-    margin: 12px 0 25px 0;
-    font-size: 26px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #cfe2ff;
-    text-shadow: 0 10px 18px rgba(0,0,0,.35);
-}
-
-/* ===== PAINEL PRINCIPAL ===== */
-.container {
-    width: 95%;
-    max-width: 1200px;
-
-    background: linear-gradient(180deg, var(--cardTop), var(--cardBottom));
-    border-radius: 16px;
-    padding: 20px;
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto 1fr auto;
-    gap: 15px;
-
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow1);
+/* efeito de desfoque real por cima da imagem */
+body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.35);
+    z-index: -1;
 }
 
-/* ===== INPUTS, SELECT E TEXTAREA ===== */
-input,
-select,
-textarea {
-    background: linear-gradient(180deg, var(--fieldTop), var(--fieldBottom));
-    border: 1px solid var(--borderStrong);
-    color: #f1f5f9;
-
-    padding: 12px 12px;
-    border-radius: 12px;
-    font-size: 14px;
-
-    transition: 0.18s ease;
-    width: 100%;
-
-    box-shadow: var(--inner), 0 10px 22px rgba(0,0,0,.18);
+/* garante que conteúdo fique acima */
+.container,
+h1{
+    position: relative;
+    z-index: 1;
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: rgba(148, 163, 184, 0.78);
+
+/* =========================================
+   CHECKBOXES - ANIMAÇÃO DE PREENCHIMENTO
+   (CRIMES + REDUÇÃO)
+========================================= */
+
+/* suaviza o hover do item inteiro */
+.crime,
+.reducao label{
+    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 
-input:hover,
-select:hover,
-textarea:hover{
-    border-color: rgba(59,130,246,.35);
+/* base mais “viva” pra todos os checkboxes (crimes e redução) */
+.crime input[type="checkbox"],
+.reducao input[type="checkbox"]{
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+    will-change: transform, box-shadow, background, border-color;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: rgba(59,130,246,.90);
-    box-shadow:
-        0 0 0 4px rgba(59, 130, 246, 0.18),
-        var(--inner),
-        0 14px 34px rgba(0,0,0,.22);
-    transform: translateY(-1px);
-}
-
-textarea {
-    resize: none;
-    min-height: 90px;
-}
-
-/* ===== BLOCO DE CRIMES ===== */
-#crimesContainer {
-    background: linear-gradient(180deg, rgba(2,6,23,.55), rgba(2,6,23,.35));
-    border-radius: 14px;
-    padding: 12px;
-
-    overflow-y: auto;
-    max-height: 100%;
-
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow2), var(--inner);
-}
-
-/* Scroll discreto */
-#crimesContainer::-webkit-scrollbar { width: 8px; }
-#crimesContainer::-webkit-scrollbar-track {
-    background: rgba(255,255,255,.05);
-    border-radius: 999px;
-}
-#crimesContainer::-webkit-scrollbar-thumb {
-    background: rgba(59,130,246,.35);
-    border-radius: 999px;
-}
-#crimesContainer::-webkit-scrollbar-thumb:hover {
-    background: rgba(59,130,246,.55);
-}
-
-/* ===== CATEGORIAS ===== */
-.categoria {
-    background: linear-gradient(180deg, rgba(17, 28, 47, 0.95), rgba(11, 18, 34, 0.70));
-    padding: 12px;
-    border-radius: 14px;
-    margin-bottom: 12px;
-
-    border: 1px solid rgba(148,163,184,.14);
-    border-left: 4px solid rgba(59,130,246,0.95);
-
-    box-shadow: 0 12px 24px rgba(0,0,0,.22);
-}
-
-.categoria h3 {
-    color: #cfe2ff;
-    margin-bottom: 10px;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-.categoria h3::before{
+/* “onda” de preenchimento */
+.crime input[type="checkbox"]::before,
+.reducao input[type="checkbox"]::before{
     content:"";
-    width:10px; height:10px;
-    border-radius:50%;
-    background: rgba(59,130,246,0.95);
-    box-shadow: 0 0 0 6px rgba(59,130,246,0.14);
-}
+    position:absolute;
+    inset:-2px;
+    border-radius: inherit;
 
-/* ===== CRIMES - CHECKBOX ALIGN ===== */
-.crime {
-    padding: 10px 10px;
-    border-bottom: 1px solid rgba(148,163,184,.12);
-
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-
-    border-radius: 12px;
-    transition: 0.15s ease;
-}
-.crime:hover{
-    background: rgba(59,130,246,.08);
-    border-bottom-color: transparent;
-    box-shadow: inset 0 0 0 1px rgba(59,130,246,.18);
-}
-.crime:last-child { border-bottom: none; }
-
-/* checkbox com profundidade */
-.crime input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    margin: 0;
-    cursor: pointer;
-
-    border: 1px solid rgba(148,163,184,.40);
-    background: rgba(2,6,23,.45);
-    box-shadow: var(--inner), 0 10px 16px rgba(0,0,0,.18);
-
-    display: inline-grid;
-    place-items: center;
-    transition: 0.14s ease;
-}
-.crime input[type="checkbox"]::after{
-    content:"";
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
+    background: rgba(255,255,255,.0);
     transform: scale(0);
-    transition: 0.12s ease;
-    background: #fff;
-}
-.crime input[type="checkbox"]:checked{
-    background: rgba(59,130,246,0.95);
-    border-color: rgba(59,130,246,1);
-    box-shadow: 0 0 0 4px rgba(59,130,246,0.14), 0 16px 26px rgba(0,0,0,.22);
-}
-.crime input[type="checkbox"]:checked::after{ transform: scale(1); }
-
-.crime label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    width: 100%;
-    justify-content: flex-start;
-    color: rgba(226,232,240,.92);
+    opacity: 0;
+    transition: transform .22s cubic-bezier(.2,.9,.2,1), opacity .18s ease;
 }
 
-/* ===== BLOCO DE REDUÇÃO ===== */
-.reducao {
-    background: linear-gradient(180deg, rgba(2,6,23,.55), rgba(2,6,23,.35));
-    padding: 14px;
-    border-radius: 14px;
-
-    border: 1px solid var(--border);
-    border-left: 4px solid #facc15;
-
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    box-shadow: var(--shadow2), var(--inner);
-}
-
-.reducao label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #cfe2ff;
-    cursor: pointer;
-}
-
-/* checkbox redução com mais profundidade */
-.reducao input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    margin: 0;
-    cursor: pointer;
-
-    border: 1px solid rgba(250,204,21,.55);
-    background: rgba(2,6,23,.45);
-    box-shadow: var(--inner), 0 10px 16px rgba(0,0,0,.18);
-
-    display: inline-grid;
-    place-items: center;
-    transition: 0.14s ease;
-}
+/* check interno */
+.crime input[type="checkbox"]::after,
 .reducao input[type="checkbox"]::after{
-    content:"";
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
     transform: scale(0);
-    transition: 0.12s ease;
-    background: #111;
+    opacity: 0;
+    transition: transform .18s cubic-bezier(.2,1.05,.2,1), opacity .12s ease;
 }
+
+/* =========================
+   CRIMES (AZUL)
+========================= */
+.crime input[type="checkbox"]::before{
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 55%),
+                rgba(59,130,246,0.95);
+}
+
+.crime input[type="checkbox"]:checked{
+    animation: cbPop .22s cubic-bezier(.2,1.1,.2,1) both;
+}
+.crime input[type="checkbox"]:checked::before{
+    transform: scale(1);
+    opacity: 1;
+}
+.crime input[type="checkbox"]:checked::after{
+    transform: scale(1);
+    opacity: 1;
+    animation: checkPop .20s cubic-bezier(.2,1.2,.2,1) .03s both;
+}
+
+/* =========================
+   REDUÇÃO (AMARELO)
+========================= */
+.reducao input[type="checkbox"]::before{
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 55%),
+                rgba(250,204,21,0.95);
+}
+
 .reducao input[type="checkbox"]:checked{
-    background: rgba(250,204,21,.95);
-    border-color: rgba(250,204,21,1);
-    box-shadow: 0 0 0 4px rgba(250,204,21,.16), 0 16px 26px rgba(0,0,0,.22);
+    animation: cbPop .22s cubic-bezier(.2,1.1,.2,1) both;
 }
-.reducao input[type="checkbox"]:checked::after{ transform: scale(1); }
-
-/* ===== BLOCO TOTAL ===== */
-.total {
-    background: linear-gradient(180deg, rgba(2,6,23,.55), rgba(2,6,23,.35));
-    padding: 14px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-
-    font-weight: 700;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    box-shadow: var(--shadow2), var(--inner);
+.reducao input[type="checkbox"]:checked::before{
+    transform: scale(1);
+    opacity: 1;
+}
+.reducao input[type="checkbox"]:checked::after{
+    transform: scale(1);
+    opacity: 1;
+    animation: checkPop .20s cubic-bezier(.2,1.2,.2,1) .03s both;
 }
 
-/* ===== BOTÕES (MAIS PROFUNDIDADE) ===== */
-button {
-    background: linear-gradient(180deg, rgba(59,130,246,0.96), rgba(37,99,235,0.96));
-    border: 1px solid rgba(59,130,246,.35);
-    padding: 14px 14px;
-    border-radius: 14px;
-
-    cursor: pointer;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-
-    transition: 0.16s ease;
-    width: 100%;
-
-    box-shadow:
-        0 18px 34px rgba(37,99,235,.25),
-        inset 0 1px 0 rgba(255,255,255,.18);
+/* Desmarcar */
+.crime input[type="checkbox"]:not(:checked),
+.reducao input[type="checkbox"]:not(:checked){
+    transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+.crime input[type="checkbox"]:active,
+.reducao input[type="checkbox"]:active{
+    transform: scale(.96);
 }
 
-button:hover {
-    transform: translateY(-1px);
-    box-shadow:
-        0 22px 44px rgba(37,99,235,.30),
-        inset 0 1px 0 rgba(255,255,255,.18);
+/* animações */
+@keyframes cbPop{
+    0%   { transform: scale(1); }
+    55%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+@keyframes checkPop{
+    0%   { transform: scale(.2); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-button:active{
-    transform: translateY(0px) scale(.99);
-    box-shadow:
-        0 16px 30px rgba(37,99,235,.22),
-        inset 0 1px 0 rgba(255,255,255,.14);
-}
-
-/* Botão estados especiais */
-button.processando {
-    background: linear-gradient(180deg, rgba(37,99,235,0.96), rgba(29,78,216,0.96));
-    border-color: rgba(59,130,246,.45);
-}
-
-button.processado {
-    background: linear-gradient(180deg, rgba(34,197,94,0.96), rgba(22,163,74,0.96));
-    border-color: rgba(34,197,94,.40);
-    box-shadow:
-        0 18px 34px rgba(34,197,94,.18),
-        inset 0 1px 0 rgba(255,255,255,.18);
-}
-
-/* ===== ORGANIZAÇÃO ===== */
-label[for="organizacao"] {
-    display: block;
-    font-size: 12px;
-    font-weight: 800;
-    color: #cfe2ff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0;
-
-    padding: 12px 12px;
-    border: 1px solid var(--border);
-    border-radius: 14px 14px 0 0;
-
-    background: linear-gradient(180deg, rgba(2,6,23,.55), rgba(15,23,42,.55));
-    box-shadow: var(--inner);
-}
-
-#organizacao {
-    display: block;
-    width: 100%;
-
-    background: linear-gradient(180deg, rgba(2,6,23,.55), rgba(15,23,42,.55));
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 14px 14px;
-
-    padding: 12px 12px;
-    color: #f1f5f9;
-    font-size: 14px;
-
-    box-shadow: var(--inner), 0 10px 22px rgba(0,0,0,.18);
-}
-
-/* ===== RELATÓRIO FINAL ===== */
-#resultadoFinal {
-    margin-top: 20px;
-    padding: 30px;
-    width: 95%;
-    max-width: 1000px;
-    border-radius: 14px;
-
-    background: linear-gradient(180deg, rgba(31,41,55,.92), rgba(17,24,39,.85));
-    color: #f1f5f9;
-    font-family: "Segoe UI", sans-serif;
-
-    border: 1px solid var(--borderStrong);
-    box-shadow: var(--shadow1);
-
-    display: none;
-    animation: slideDown 0.4s ease;
-
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* Classe para ativar relatório */
-#resultadoFinal.ativo { display: flex; }
-
-/* Linhas e títulos do relatório */
-#resultadoFinal .linha { margin-bottom: 8px; color: rgba(226,232,240,.92); }
-#resultadoFinal .totalBox { font-weight: 800; color: #facc15; }
-
-#resultadoFinal .relatorio-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(148,163,184,.20);
-    padding-bottom: 10px;
-}
-
-#resultadoFinal .relatorio-titulo {
-    font-size: 20px;
-    font-weight: 800;
-    color: #cfe2ff;
-}
-
-#resultadoFinal .subtitulo {
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(226,232,240,.78);
-}
-
-/* ===== ANIMAÇÃO SLIDE ===== */
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== RESPONSIVO ===== */
-@media (max-width: 768px) {
-    .container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto auto;
-        border-radius: 14px;
+/* Acessibilidade */
+@media (prefers-reduced-motion: reduce){
+    .crime input[type="checkbox"],
+    .reducao input[type="checkbox"],
+    .crime input[type="checkbox"]::before,
+    .reducao input[type="checkbox"]::before,
+    .crime input[type="checkbox"]::after,
+    .reducao input[type="checkbox"]::after{
+        animation: none !important;
+        transition: none !important;
     }
+}
+/* =========================================
+   FUNDO - CIDADE NOTURNA REAL (IMAGEM)
+========================================= */
 
-    .reducao,
-    .total,
-    button {
-        width: 100%;
+body{
+    position: relative;
+    overflow: hidden;
+
+    background: 
+        linear-gradient(rgba(5,10,20,0.75), rgba(5,10,20,0.85)),
+        url("https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2000&auto=format&fit=crop");
+
+    background-size: cover;
+    background-position: center bottom;
+    background-attachment: fixed;
+}
+
+/* efeito de desfoque real por cima da imagem */
+body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.35);
+    z-index: -1;
+}
+
+/* garante que conteúdo fique acima */
+.container,
+h1{
+    position: relative;
+    z-index: 1;
+}
+
+
+/* =========================================
+   CHECKBOXES - ANIMAÇÃO DE PREENCHIMENTO
+   (CRIMES + REDUÇÃO)
+========================================= */
+
+/* suaviza o hover do item inteiro */
+.crime,
+.reducao label{
+    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+/* base mais “viva” pra todos os checkboxes (crimes e redução) */
+.crime input[type="checkbox"],
+.reducao input[type="checkbox"]{
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+    will-change: transform, box-shadow, background, border-color;
+}
+
+/* “onda” de preenchimento */
+.crime input[type="checkbox"]::before,
+.reducao input[type="checkbox"]::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius: inherit;
+
+    background: rgba(255,255,255,.0);
+    transform: scale(0);
+    opacity: 0;
+    transition: transform .22s cubic-bezier(.2,.9,.2,1), opacity .18s ease;
+}
+
+/* check interno */
+.crime input[type="checkbox"]::after,
+.reducao input[type="checkbox"]::after{
+    transform: scale(0);
+    opacity: 0;
+    transition: transform .18s cubic-bezier(.2,1.05,.2,1), opacity .12s ease;
+}
+
+/* =========================
+   CRIMES (AZUL)
+========================= */
+.crime input[type="checkbox"]::before{
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 55%),
+                rgba(59,130,246,0.95);
+}
+
+.crime input[type="checkbox"]:checked{
+    animation: cbPop .22s cubic-bezier(.2,1.1,.2,1) both;
+}
+.crime input[type="checkbox"]:checked::before{
+    transform: scale(1);
+    opacity: 1;
+}
+.crime input[type="checkbox"]:checked::after{
+    transform: scale(1);
+    opacity: 1;
+    animation: checkPop .20s cubic-bezier(.2,1.2,.2,1) .03s both;
+}
+
+/* =========================
+   REDUÇÃO (AMARELO)
+========================= */
+.reducao input[type="checkbox"]::before{
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 55%),
+                rgba(250,204,21,0.95);
+}
+
+.reducao input[type="checkbox"]:checked{
+    animation: cbPop .22s cubic-bezier(.2,1.1,.2,1) both;
+}
+.reducao input[type="checkbox"]:checked::before{
+    transform: scale(1);
+    opacity: 1;
+}
+.reducao input[type="checkbox"]:checked::after{
+    transform: scale(1);
+    opacity: 1;
+    animation: checkPop .20s cubic-bezier(.2,1.2,.2,1) .03s both;
+}
+
+/* Desmarcar */
+.crime input[type="checkbox"]:not(:checked),
+.reducao input[type="checkbox"]:not(:checked){
+    transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+.crime input[type="checkbox"]:active,
+.reducao input[type="checkbox"]:active{
+    transform: scale(.96);
+}
+
+/* animações */
+@keyframes cbPop{
+    0%   { transform: scale(1); }
+    55%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+@keyframes checkPop{
+    0%   { transform: scale(.2); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Acessibilidade */
+@media (prefers-reduced-motion: reduce){
+    .crime input[type="checkbox"],
+    .reducao input[type="checkbox"],
+    .crime input[type="checkbox"]::before,
+    .reducao input[type="checkbox"]::before,
+    .crime input[type="checkbox"]::after,
+    .reducao input[type="checkbox"]::after{
+        animation: none !important;
+        transition: none !important;
     }
 }

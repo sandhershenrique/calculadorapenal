@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Calculadora Penal - Sistema Oficial</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+:root{
+  --bg1:#0b0f17;
+  --txt:#e5e7eb;
+  --shadow: 0 18px 50px rgba(0,0,0,.45);
+  --shadow2: 0 10px 24px rgba(0,0,0,.35);
+
+  --blue: rgba(59,130,246,.95);
+  --green: rgba(34,197,94,.95);
+  --red: rgba(239,68,68,.95);
+}
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(59,130,246,.18), transparent 55%),
+    radial-gradient(1000px 700px at 80% 10%, rgba(34,197,94,.10), transparent 55%),
+    linear-gradient(135deg,var(--bg1),#111827);
+  color:var(--txt);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:22px 14px 28px;
+  position:relative;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+
+/* =========================================
+   ✅ FUNDO REAL: CIDADE NOTURNA DESFOCADA
+========================================= */
+.bg-cidade{
+  position:fixed;
+  inset:0;
+  z-index:-3;
+  pointer-events:none;
+  background-image:
+    url("https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=2400&q=80");
+  background-size:cover;
+  background-position:center bottom;
+  background-repeat:no-repeat;
+  filter: blur(16px) brightness(0.62) saturate(1.25) contrast(1.05);
+  transform: scale(1.10);
+  opacity:.95;
+}
+.bg-overlay{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  pointer-events:none;
+  background:
+    radial-gradient(1100px 800px at 50% 15%, rgba(0,0,0,.18), rgba(0,0,0,.70)),
+    linear-gradient(180deg, rgba(5,10,20,.45) 0%, rgba(5,10,20,.78) 100%);
+}
+.container, h1, #modalOverlay{ position:relative; z-index:1; }
+
+/* =========================================
+   ✅ HEADER (CAIXA ROBUSTA DO TÍTULO)
+========================================= */
+.headerBox{
+  width: min(1100px, 95vw);
+  margin: 8px 0 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,.18);
+  background:
+    linear-gradient(180deg, rgba(2,6,23,.74), rgba(2,6,23,.52));
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.48),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter: blur(10px);
+  position:relative;
+  overflow:hidden;
+}
+
+/* brilho “técnico” no topo */
+.headerBox::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 25% 20%, rgba(59,130,246,.22), transparent 55%),
+    radial-gradient(circle at 75% 25%, rgba(34,197,94,.10), transparent 58%),
+    linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent);
+  filter: blur(10px);
+  opacity:.85;
+}
+
+/* linha “scan” sutil */
+.headerBox::after{
+  content:"";
+  position:absolute;
+  left:-30%;
+  top:-40%;
+  width:60%;
+  height:180%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent);
+  transform: rotate(18deg);
+  opacity:.35;
+  animation: headerScan 4.2s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes headerScan{
+  0%{ transform: rotate(18deg) translateX(0); opacity:.10; }
+  30%{ opacity:.35; }
+  100%{ transform: rotate(18deg) translateX(240%); opacity:.12; }
+}
+
+/* ===== TÍTULO ===== */
+h1{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  font-size:28px;
+  letter-spacing:2px;
+  margin:0;                 /* agora quem espaça é a headerBox */
+  color:#cfe2ff;
+  text-transform:uppercase;
+  user-select:none;
+  position:relative;
+  z-index:2;
+}
+
+/* título com “placa” interna + textura */
+.hTitle{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,.18);
+  background:
+    linear-gradient(180deg, rgba(15,23,42,.55), rgba(2,6,23,.42));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 14px 34px rgba(0,0,0,.30);
+  position:relative;
+  overflow:hidden;
+}
+.hTitle::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,.05), transparent);
+  background-size: 14px 14px, 100% 100%;
+  opacity:.55;
+  pointer-events:none;
+}
+.hMain{
+  font-weight:1000;
+  text-shadow:
+    0 10px 22px rgba(0,0,0,.45),
+    0 0 24px rgba(59,130,246,.12);
+}
+.hSub{
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2.6px;
+  color: rgba(226,232,240,.72);
+  text-transform:uppercase;
+}
+
+/* ===== LOGO FIXA NO CANTO + ANIMAÇÃO + DESFOQUE + ESTÁTICA ===== */
+h1 img{
+  width:150px;
+  height:150;
+  object-fit:contain;
+
+  position:fixed;
+  top:14px;
+  left:14px;
+  z-index:999;
+
+  transform: translateZ(0);
+  will-change: transform, filter, opacity;
+
+  filter:
+    drop-shadow(0 16px 18px rgba(0,0,0,.42))
+    drop-shadow(0 0 22px rgba(59,130,246,.22))
+    blur(.35px);
+
+  animation:
+    logoFloat 3.8s ease-in-out infinite,
+    logoPulse 2.2s ease-in-out infinite,
+    logoStatic 0.16s steps(2, end) infinite;
+}
+@keyframes logoFloat{
+  0%,100%{ transform: translateY(0) rotate(-1deg); }
+  50%{ transform: translateY(-7px) rotate(1.4deg); }
+}
+@keyframes logoPulse{
+  0%,100%{
+    filter:
+      drop-shadow(0 16px 18px rgba(0,0,0,.42))
+      drop-shadow(0 0 18px rgba(59,130,246,.16))
+      blur(.35px);
+  }
+  50%{
+    filter:
+      drop-shadow(0 18px 22px rgba(0,0,0,.46))
+      drop-shadow(0 0 30px rgba(59,130,246,.32))
+      blur(.55px);
+  }
+}
+@keyframes logoStatic{
+  0%{ opacity:.97; transform: translate3d(0,0,0) rotate(-1deg); }
+  25%{ opacity:.93; transform: translate3d(0.6px,-0.4px,0) rotate(-0.6deg); }
+  50%{ opacity:.98; transform: translate3d(-0.5px,0.6px,0) rotate(0.2deg); }
+  75%{ opacity:.94; transform: translate3d(0.4px,0.3px,0) rotate(0.8deg); }
+  100%{ opacity:.97; transform: translate3d(0,0,0) rotate(-1deg); }
+}
+
+.container{
+  width: min(1100px, 95vw);
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+  background: linear-gradient(180deg, rgba(15,23,42,.72), rgba(15,23,42,.56));
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius:16px;
+  padding:16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+@media (max-width: 880px){
+  .container{ grid-template-columns:1fr; }
+}
+
+.field{display:flex; flex-direction:column; gap:7px;}
+label{font-size:12px; color:rgba(226,232,240,.85); letter-spacing:.4px;}
+
+input, select, textarea{
+  width:100%;
+  padding:12px 12px;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.22);
+  background: rgba(2,6,23,.55);
+  color:#f8fafc;
+  font-size:14px;
+  outline:none;
+  transition: .18s ease;
+}
+input::placeholder, textarea::placeholder{ color: rgba(148,163,184,.75); }
+input:focus, select:focus, textarea:focus{
+  border-color: rgba(59,130,246,.9);
+  box-shadow: 0 0 0 4px rgba(59,130,246,.18);
+  transform: translateY(-1px);
+}
+textarea{ resize:none; min-height:92px; }
+
+/* =========================================
+   ✅ SELECT “ORGANIZAÇÃO” COM LISTA FLUTUANTE
+========================================= */
+.selectWrap{ position:relative; width:100%; }
+
+.selectBtn{
+  width:100%;
+  padding:12px 44px 12px 12px;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.22);
+  background: rgba(2,6,23,.55);
+  color:#f8fafc;
+  font-size:14px;
+  outline:none;
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  position:relative;
+  overflow:hidden;
+}
+.selectBtn::before{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  pointer-events:none;
+  background: radial-gradient(circle at 20% 20%, rgba(59,130,246,.14), transparent 55%);
+  filter: blur(8px);
+  opacity:.9;
+}
+.selectBtn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(59,130,246,.60);
+  box-shadow: 0 0 0 4px rgba(59,130,246,.14);
+}
+.selectBtn:active{ transform: translateY(0px) scale(.99); }
+
+.selectCaret{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform: translateY(-50%);
+  width:28px;
+  height:28px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(148,163,184,.18);
+  background: rgba(15,23,42,.45);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.selectCaret::before{
+  content:"";
+  width:10px; height:10px;
+  border-right:2px solid rgba(226,232,240,.9);
+  border-bottom:2px solid rgba(226,232,240,.9);
+  transform: rotate(45deg);
+}
+.selectWrap.open .selectCaret{
+  transform: translateY(-50%) rotate(-180deg);
+  border-color: rgba(59,130,246,.40);
+  box-shadow: 0 0 0 4px rgba(59,130,246,.10);
+}
+
+.selectMenu{
+  position:absolute;
+  left:0;
+  right:0;
+  top: calc(100% + 10px);
+  border-radius:14px;
+  border:1px solid rgba(148,163,184,.18);
+  background: linear-gradient(180deg, rgba(2,6,23,.92), rgba(2,6,23,.80));
+  box-shadow: 0 22px 60px rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+  padding:8px;
+  z-index:80;
+
+  transform-origin: 50% 0%;
+  transform: translateY(-8px) scale(.98);
+  opacity:0;
+  pointer-events:none;
+
+  transition: opacity .16s ease, transform .22s cubic-bezier(.2,.9,.2,1);
+}
+.selectWrap.open .selectMenu{
+  opacity:1;
+  pointer-events:auto;
+  transform: translateY(0px) scale(1);
+  animation: menuPop .28s cubic-bezier(.2,1.15,.2,1) both;
+}
+@keyframes menuPop{
+  0%{ transform: translateY(-10px) scale(.96); opacity:0; }
+  60%{ transform: translateY(0px) scale(1.02); opacity:1; }
+  100%{ transform: translateY(0px) scale(1); opacity:1; }
+}
+
+.selectItem{
+  padding:10px 10px;
+  border-radius:12px;
+  color: rgba(226,232,240,.92);
+  font-weight:800;
+  letter-spacing:.2px;
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+
+  border:1px solid transparent;
+  background: rgba(15,23,42,.30);
+  transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+  position:relative;
+  overflow:hidden;
+}
+.selectItem::after{
+  content:"";
+  position:absolute;
+  top:-20%;
+  left:-40%;
+  width:60%;
+  height:140%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+  transform: rotate(18deg) translateX(0);
+  opacity:0;
+  transition: opacity .14s ease;
+  pointer-events:none;
+}
+.selectItem:hover{
+  transform: translateY(-1px);
+  background: rgba(59,130,246,.10);
+  border-color: rgba(59,130,246,.22);
+  box-shadow: 0 14px 28px rgba(0,0,0,.22);
+}
+.selectItem:hover::after{
+  opacity:1;
+  animation: itemSheen .65s ease-out both;
+}
+@keyframes itemSheen{
+  from{ transform: rotate(18deg) translateX(0); }
+  to{ transform: rotate(18deg) translateX(220%); }
+}
+.selectItem:active{ transform: translateY(0px) scale(.99); }
+.selectItem.selected{
+  background: rgba(34,197,94,.12);
+  border-color: rgba(34,197,94,.26);
+}
+.selectItem .tag{
+  font-size:11px;
+  font-weight:1000;
+  color: rgba(134,239,172,.92);
+  padding:5px 8px;
+  border-radius:999px;
+  border:1px solid rgba(34,197,94,.30);
+  background: rgba(34,197,94,.10);
+}
+.selectPlaceholder{
+  color: rgba(148,163,184,.90);
+  font-weight:900;
+}
+#organizacao{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* crimes */
+#crimesContainer{
+  grid-column: 1 / -1;
+  background: linear-gradient(180deg, rgba(2,6,23,.55), rgba(2,6,23,.35));
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius:14px;
+  padding:12px;
+  max-height:260px;
+  overflow:auto;
+  box-shadow: var(--shadow2);
+}
+#crimesContainer::-webkit-scrollbar{ width:10px; }
+#crimesContainer::-webkit-scrollbar-track{ background: rgba(255,255,255,.05); border-radius:999px; }
+#crimesContainer::-webkit-scrollbar-thumb{ background: rgba(59,130,246,.45); border-radius:999px; }
+#crimesContainer::-webkit-scrollbar-thumb:hover{ background: rgba(59,130,246,.65); }
+
+.categoria{
+  background: linear-gradient(180deg, rgba(15,23,42,.85), rgba(11,18,34,.65));
+  border: 1px solid rgba(148,163,184,.14);
+  border-left: 4px solid rgba(59,130,246,.95);
+  border-radius:14px;
+  padding:12px 12px 10px;
+  margin-bottom:12px;
+}
+.categoria h3{
+  margin:0 0 10px;
+  font-size:12px;
+  color:#cfe2ff;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.categoria h3::before{
+  content:"";
+  width:10px; height:10px;
+  border-radius:50%;
+  background: rgba(59,130,246,.95);
+  box-shadow: 0 0 0 6px rgba(59,130,246,.12);
+}
+.crime{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 10px;
+  border-radius:12px;
+  border:1px solid transparent;
+  transition:.16s ease;
+  position:relative;
+  overflow:hidden;
+}
+.crime:hover{
+  background: rgba(59,130,246,.08);
+  border-color: rgba(59,130,246,.18);
+  transform: translateY(-1px);
+}
+.crime + .crime{ margin-top:6px; }
+
+/* ✅ check com preenchimento */
+.crime input[type="checkbox"]{
+  appearance:none;
+  -webkit-appearance:none;
+  width:22px;
+  height:22px;
+  border-radius:7px;
+  border:1px solid rgba(148,163,184,.42);
+  background: rgba(2,6,23,.55);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  flex: 0 0 auto;
+
+  position:relative;
+  overflow:hidden;
+  transform: translateZ(0);
+  will-change: transform, box-shadow, border-color;
+
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  outline:none;
+}
+.crime input[type="checkbox"]::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 55%),
+    rgba(59,130,246,.95);
+  transform: scale(0);
+  opacity:0;
+  transition: transform .22s cubic-bezier(.2,.9,.2,1), opacity .18s ease;
+}
+.crime input[type="checkbox"]::after{
+  content:"";
+  width:10px;
+  height:6px;
+  border-left: 2.6px solid #fff;
+  border-bottom: 2.6px solid #fff;
+  transform: translateY(-1px) rotate(-45deg) scale(0);
+  opacity:0;
+  transform-origin:center;
+  transition: transform .18s cubic-bezier(.2,1.05,.2,1), opacity .12s ease;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.25));
+  z-index:1;
+}
+.crime:hover input[type="checkbox"]{
+  transform: translateY(-1px) scale(1.03);
+  border-color: rgba(59,130,246,.62);
+  box-shadow: 0 0 0 4px rgba(59,130,246,.12);
+}
+.crime input[type="checkbox"]:checked{
+  border-color: rgba(59,130,246,1);
+  box-shadow: 0 0 0 4px rgba(59,130,246,.15);
+  animation: cbPop .22s cubic-bezier(.2,1.1,.2,1) both;
+}
+.crime input[type="checkbox"]:checked::before{ transform: scale(1); opacity:1; }
+.crime input[type="checkbox"]:checked::after{
+  transform: translateY(-1px) rotate(-45deg) scale(1);
+  opacity:1;
+  animation: checkPop .20s cubic-bezier(.2,1.2,.2,1) .03s both;
+}
+@keyframes cbPop{ 0%{ transform: scale(1);} 55%{ transform: scale(1.08);} 100%{ transform: scale(1);} }
+@keyframes checkPop{ 0%{ transform: scale(.2); opacity:0;} 100%{ transform: scale(1); opacity:1;} }
+
+/* reduções + total */
+.reducao, .total, .history{
+  background: linear-gradient(180deg, rgba(2,6,23,.55), rgba(2,6,23,.35));
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius:14px;
+  padding:14px;
+  box-shadow: var(--shadow2);
+}
+.reducao h3, .history h3{
+  margin:0 0 12px;
+  font-size:12px;
+  letter-spacing:.9px;
+  color:#cfe2ff;
+  text-transform:uppercase;
+}
+.check-group{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:10px 0;
+  padding:10px;
+  border-radius:12px;
+  background: rgba(15,23,42,.45);
+  border:1px solid rgba(148,163,184,.14);
+}
+.check-group span{
+  width:160px;
+  font-weight:700;
+  font-size:13px;
+  color:#f1f5f9;
+  text-align:left;
+}
+
+/* pills (sim/não) */
+.pill{ display:flex; gap:10px; margin-left:auto; }
+.pill label{
+  cursor:pointer;
+  user-select:none;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.3px;
+  color: rgba(226,232,240,.88);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.16);
+  background: rgba(2,6,23,.35);
+  position:relative;
+  overflow:hidden;
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.pill input{
+  appearance:none;
+  -webkit-appearance:none;
+  width:18px; height:18px;
+  border-radius:6px;
+  border:1px solid rgba(148,163,184,.35);
+  background: rgba(2,6,23,.5);
+  position:relative;
+  overflow:hidden;
+}
+.pill input::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:inherit;
+  transform: scale(0);
+  opacity:0;
+  transition: transform .22s cubic-bezier(.2,.9,.2,1), opacity .18s ease;
+}
+.pill input::after{
+  content:"";
+  width:8px; height:5px;
+  border-left: 2.4px solid #fff;
+  border-bottom: 2.4px solid #fff;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform: translate(-50%,-60%) rotate(-45deg) scale(0);
+  opacity:0;
+  transition: transform .18s cubic-bezier(.2,1.05,.2,1), opacity .12s ease;
+}
+.pill input:checked{ animation: cbPop .22s cubic-bezier(.2,1.1,.2,1) both; }
+.pill input:checked::after{
+  transform: translate(-50%,-60%) rotate(-45deg) scale(1);
+  opacity:1;
+  animation: checkPop .20s cubic-bezier(.2,1.2,.2,1) .03s both;
+}
+.pill input:checked::before{
+  transform: scale(1);
+  opacity:1;
+  background: rgba(34,197,94,.95);
+}
+.pill label.no input:checked::before{ background: rgba(239,68,68,.95); }
+
+.total{ font-size:14px; line-height:1.6; }
+.total span{ font-weight:900; color:#fff; }
+.total .row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 10px;
+  border-radius:10px;
+  background: rgba(15,23,42,.45);
+  border:1px solid rgba(148,163,184,.12);
+  margin:6px 0;
+}
+
+#btnAplicar{
+  grid-column: 1 / -1;
+  width:100%;
+  padding:14px 14px;
+  border-radius:14px;
+  border:1px solid rgba(59,130,246,.35);
+  background: linear-gradient(180deg, rgba(59,130,246,.95), rgba(37,99,235,.95));
+  color:#fff;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:.16s ease;
+  box-shadow: 0 16px 30px rgba(37,99,235,.25);
+}
+#btnAplicar:hover{ transform: translateY(-1px); box-shadow: 0 18px 38px rgba(37,99,235,.30); }
+#btnAplicar:active{ transform: translateY(0px) scale(.99); }
+
+/* loading */
+#loadingPanel{
+  grid-column: 1 / -1;
+  display:none;
+  border-radius:14px;
+  padding:16px 16px 14px;
+  box-shadow: var(--shadow2);
+  border:1px solid rgba(148,163,184,.18);
+  background: linear-gradient(180deg, rgba(2,6,23,.78), rgba(2,6,23,.52));
+  position:relative;
+  overflow:hidden;
+}
+#loadingTitle{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-weight:900;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  color:#dbeafe;
+  margin-bottom:6px;
+}
+#loadingStatus{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  color: rgba(226,232,240,.88);
+  font-weight:900;
+  margin-bottom:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.progressWrap{
+  width:100%;
+  height:16px;
+  border-radius:12px;
+  background: rgba(0,0,0,.28);
+  border:1px solid rgba(148,163,184,.20);
+  overflow:hidden;
+  position:relative;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,.55), 0 12px 22px rgba(0,0,0,.22);
+}
+#progressBar{
+  width:0%;
+  height:100%;
+  border-radius:12px;
+  background: repeating-linear-gradient(90deg, rgba(34,197,94,.95) 0 10px, rgba(34,197,94,.70) 10px 12px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 0 18px rgba(34,197,94,.18);
+  transition: width .08s linear;
+}
+#loadingDone{
+  display:none;
+  margin-top:12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-weight:1000;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  background: rgba(34,197,94,.12);
+  border:1px solid rgba(34,197,94,.35);
+  color: #86efac;
+}
+
+/* histórico */
+.history{ grid-column: 1 / -1; }
+.historyTop{
+  display:flex;
+  gap:10px;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+.historyBadge{
+  font-size:12px;
+  font-weight:900;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.20);
+  background: rgba(15,23,42,.40);
+  color: rgba(226,232,240,.92);
+}
+.historyList{
+  max-height: 260px;
+  overflow:auto;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.16);
+  background: rgba(15,23,42,.35);
+  padding:10px;
+}
+.hItem{
+  border:1px solid rgba(148,163,184,.14);
+  background: rgba(2,6,23,.35);
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.hRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 14px;
+  align-items:center;
+  font-size:13px;
+  color: rgba(226,232,240,.92);
+}
+.hRow strong{ color:#fff; }
+.hMeta{
+  font-size:12px;
+  color: rgba(226,232,240,.70);
+  margin-top:6px;
+  line-height:1.35;
+}
+.hMiniTitle{
+  font-size:12px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  color:#cfe2ff;
+  margin:10px 0 6px;
+}
+.hEmpty{
+  color: rgba(226,232,240,.70);
+  font-size:13px;
+  padding:10px;
+}
+
+/* modal */
+#modalOverlay{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  background:rgba(0,0,0,0.62);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  padding:16px;
+  overflow:auto;
+}
+
+/* relatório */
+#resultadoFinal{
+  width:820px;
+  max-width:95%;
+  max-height: 86vh;
+  overflow-y: auto;
+  padding:34px;
+
+  background:#ffffff;
+  color:#111;
+  border-radius:12px;
+  position:relative;
+  box-shadow:0 0 30px rgba(0,0,0,0.6);
+  font-family:"Times New Roman", serif;
+
+  background-image:
+    radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(0,0,0,0.02), rgba(0,0,0,0.00));
+  background-size: 14px 14px, 100% 100%;
+}
+#resultadoFinal.capturando{
+  max-height:none !important;
+  overflow:visible !important;
+}
+.relatorio-header{
+  display:flex;
+  align-items:center;
+  margin-bottom:18px;
+  padding-bottom:12px;
+  border-bottom:2px solid #111;
+}
+.relatorio-header img{
+  width:78px; height:78px;
+  margin-right:18px;
+  object-fit:contain;
+}
+.relatorio-titulo{
+  font-size:26px;
+  font-weight:bold;
+  color:#111;
+  letter-spacing:.5px;
+}
+.subtitulo{ font-size:13px; color:#444; margin-top:3px; }
+.bloco{ margin-top:14px; }
+.bloco h3{
+  color:#111;
+  border-bottom:1px solid #333;
+  padding-bottom:5px;
+  margin-bottom:8px;
+}
+.linha{ margin:6px 0; font-size:14px; line-height:1.3; }
+.totalBox{
+  font-weight:bold;
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #111;
+  border-radius:8px;
+  background:rgba(0,0,0,0.03);
+}
+#termoTexto{ white-space:pre-line; font-size:14px; line-height:1.45; color:#111; }
+.termo-box{
+  border:1px dashed rgba(0,0,0,.45);
+  background: rgba(0,0,0,0.02);
+  padding:12px;
+  border-radius:10px;
+}
+.relatorio-fechar-final{
+  margin-top:18px;
+  padding-top:12px;
+  border-top:1px dashed rgba(0,0,0,.35);
+  display:flex;
+  justify-content:flex-end;
+}
+.relatorio-fechar-final button{
+  background: #111;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:10px 12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.relatorio-fechar-final button:hover{ opacity:.9; }
+</style>
+</head>
+
+<body>
+
+<div class="bg-cidade"></div>
+<div class="bg-overlay"></div>
+
+<!-- ✅ CAIXA ROBUSTA DO TÍTULO -->
+<div class="headerBox">
+  <h1>
+    <img src="foto.png" alt="Logo Polícia">
+    <div class="hTitle">
+      <div class="hMain">CALCULADORA PENAL</div>
+      <div class="hSub">SISTEMA OFICIAL • REGISTRO E CONTROLE</div>
+    </div>
+  </h1>
+</div>
+
+<div class="container">
+
+  <div class="field">
+    <label>Nome do Policial</label>
+    <input id="policial" placeholder="Ex: João Silva">
+  </div>
+
+  <div class="field">
+    <label>Passaporte do Policial (ID)</label>
+    <input id="idpolicial" placeholder="Ex: 12345">
+  </div>
+
+  <div class="field">
+    <label>Nome do Infrator</label>
+    <input id="suspeito" placeholder="Ex: Carlos Pereira">
+  </div>
+
+  <div class="field">
+    <label>Passaporte do Infrator (ID)</label>
+    <input id="idsuspeito" placeholder="Ex: 67890">
+  </div>
+
+  <!-- ✅ HISTÓRICO CRIMINAL -->
+  <div class="history">
+    <div class="historyTop">
+      <h3 style="margin:0;">Histórico Criminal</h3>
+      <div class="historyBadge" id="historyBadge">ID: — | Registros: 0</div>
+    </div>
+    <div class="historyList" id="historyList">
+      <div class="hEmpty">Digite o ID do infrator para puxar o histórico automaticamente.</div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>A qual organização você participa?</label>
+    <select id="organizacao">
+      <option value="" selected disabled>SELECIONE</option>
+      <option value="POLÍCIA CIVIL">POLÍCIA CIVIL</option>
+      <option value="POLÍCIA MILITAR">POLÍCIA MILITAR</option>
+      <option value="RONE">RONE</option>
+      <option value="POLÍCIA RODOVIÁRIA FEDERAL">POLÍCIA RODOVIÁRIA FEDERAL</option>
+      <option value="POLÍCIA FEDERAL">POLÍCIA FEDERAL</option>
+    </select>
+  </div>
+
+  <div id="crimesContainer"></div>
+
+  <div class="reducao">
+    <h3>Finalização - Reduções</h3>
+
+    <div class="check-group">
+      <span>Réu primário</span>
+      <div class="pill">
+        <label class="yes"><input type="checkbox" name="reu" value="sim" onclick="unico(this);calcular()">SIM</label>
+        <label class="no"><input type="checkbox" name="reu" value="nao" onclick="unico(this);calcular()">NÃO</label>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <span>Bom comportamento</span>
+      <div class="pill">
+        <label class="yes"><input type="checkbox" name="bom" value="sim" onclick="unico(this);calcular()">SIM</label>
+        <label class="no"><input type="checkbox" name="bom" value="nao" onclick="unico(this);calcular()">NÃO</label>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <span>Ficha limpa</span>
+      <div class="pill">
+        <label class="yes"><input type="checkbox" name="ficha" value="sim" onclick="unico(this);calcular()">SIM</label>
+        <label class="no"><input type="checkbox" name="ficha" value="nao" onclick="unico(this);calcular()">NÃO</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="total">
+    <div class="row">Meses Totais <span id="meses">0</span></div>
+    <div class="row">Multa Total <span>$<span id="multa">0</span></span></div>
+    <div class="row">Fiança Total <span>$<span id="fianca">0</span></span></div>
+    <div class="row">Total Geral <span>$<span id="total">0</span></span></div>
+  </div>
+
+  <div class="field" style="grid-column:1/-1;">
+    <label>Observações do policial</label>
+    <textarea id="obs" placeholder="Digite aqui..."></textarea>
+  </div>
+
+  <button id="btnAplicar" onclick="gerarRelatorio()">APLICAR PENA</button>
+
+  <div id="loadingPanel">
+    <div id="loadingTitle">CARREGANDO DADOS</div>
+    <div id="loadingStatus">carregando dados</div>
+    <div class="progressWrap"><div id="progressBar"></div></div>
+    <div id="loadingDone">REGISTRO FEITO COM SUCESSO</div>
+  </div>
+</div>
+
+<div id="modalOverlay">
+  <div id="resultadoFinal">
+
+    <div class="relatorio-header">
+      <img src="foto.png" alt="Logo Polícia">
+      <div>
+        <div class="relatorio-titulo">RELATÓRIO PENAL OFICIAL</div>
+        <div class="subtitulo">Departamento de Polícia - Sistema Judicial</div>
+      </div>
+    </div>
+
+    <div id="dados" class="bloco"></div>
+
+    <div class="bloco">
+      <h3>Infrações Registradas</h3>
+      <div id="listaCrimes"></div>
+    </div>
+
+    <div class="bloco">
+      <h3>Observações do Policial</h3>
+      <div id="observacaoFinal"></div>
+    </div>
+
+    <div class="bloco">
+      <h3>Termo / Declaração</h3>
+      <div class="termo-box">
+        <div id="termoTexto"></div>
+      </div>
+    </div>
+
+    <div class="bloco" id="protocoloBloco">
+      <h3>Protocolo e Data</h3>
+      <div id="protocolo"></div>
+      <div id="dataHora"></div>
+    </div>
+
+    <div class="relatorio-fechar-final">
+      <button type="button" onclick="fecharRelatorio()">(x) FECHAR</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1471684006901842001/vQFiUpag8t2xCAR7pzx0Al_gepXby2ZrY3p1jeVDSAhUynfXwxOE36l7guhsYwO1g0yc";
+
+/* =========================
+   ✅ SELECT CUSTOM (ORGANIZAÇÃO)
+========================= */
+(function initCustomSelect(){
+  const select = document.getElementById("organizacao");
+  if(!select) return;
+
+  const field = select.closest(".field");
+  if(!field) return;
+
+  const wrap = document.createElement("div");
+  wrap.className = "selectWrap";
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "selectBtn";
+  btn.innerHTML = `<span class="selectPlaceholder">SELECIONE</span><span class="selectCaret"></span>`;
+
+  const menu = document.createElement("div");
+  menu.className = "selectMenu";
+
+  field.appendChild(wrap);
+  wrap.appendChild(btn);
+  wrap.appendChild(menu);
+  wrap.appendChild(select);
+
+  function rebuild(){
+    menu.innerHTML = "";
+    const opts = Array.from(select.options).filter(o => !o.disabled && o.value);
+    opts.forEach(opt=>{
+      const item = document.createElement("div");
+      item.className = "selectItem";
+      item.dataset.value = opt.value;
+      item.innerHTML = `<span>${opt.text}</span><span class="tag" style="display:none;">SELECIONADO</span>`;
+      menu.appendChild(item);
+    });
+    syncSelected();
+  }
+
+  function setBtnText(text, isPlaceholder){
+    const span = btn.querySelector("span");
+    if(!span) return;
+    span.textContent = text;
+    span.className = isPlaceholder ? "selectPlaceholder" : "";
+  }
+
+  function syncSelected(){
+    const v = select.value;
+    const items = Array.from(menu.querySelectorAll(".selectItem"));
+    items.forEach(i=>{
+      const isSel = i.dataset.value === v;
+      i.classList.toggle("selected", isSel);
+      const tag = i.querySelector(".tag");
+      if(tag) tag.style.display = isSel ? "inline-flex" : "none";
+    });
+
+    const opt = Array.from(select.options).find(o => o.value === v);
+    if(opt && v){
+      setBtnText(opt.text, false);
+    }else{
+      setBtnText("SELECIONE", true);
+    }
+  }
+
+  function open(){ wrap.classList.add("open"); }
+  function close(){ wrap.classList.remove("open"); }
+  function toggle(){ wrap.classList.contains("open") ? close() : open(); }
+
+  btn.addEventListener("click", (e)=>{ e.preventDefault(); toggle(); });
+
+  menu.addEventListener("click", (e)=>{
+    const item = e.target.closest(".selectItem");
+    if(!item) return;
+
+    item.animate(
+      [{ transform:"translateY(-1px) scale(1.01)" }, { transform:"translateY(0px) scale(.98)" }, { transform:"translateY(0px) scale(1)" }],
+      { duration: 220, easing: "cubic-bezier(.2,1.15,.2,1)" }
+    );
+
+    select.value = item.dataset.value;
+    select.dispatchEvent(new Event("change", { bubbles:true }));
+    syncSelected();
+    close();
+  });
+
+  document.addEventListener("click", (e)=>{
+    if(!wrap.contains(e.target)) close();
+  }, true);
+  window.addEventListener("scroll", close, true);
+
+  select.addEventListener("change", syncSelected);
+
+  rebuild();
+  syncSelected();
+})();
+
+/* =========================
+   CRIMES
+========================= */
+const categorias = [
+  {titulo:"ITENS ILEGAIS – ART. 2º", dados:[
+      {num:"2.2", nome:"Drogas uso próprio", meses:0, multa:6250, fianca:0},
+      {num:"2.3", nome:"Dinheiro sujo < 100k", meses:0, multa:6250, fianca:0},
+      {num:"2.4", nome:"Algemas/capuz/keycard", meses:6, multa:6250, fianca:6250},
+      {num:"2.5", nome:"Masterpick/lockpick", meses:6, multa:6250, fianca:6250},
+      {num:"2.6", nome:"Colete balístico", meses:13, multa:12500, fianca:12500},
+      {num:"2.7", nome:"Veículo clonado", meses:13, multa:12500, fianca:12500},
+      {num:"2.8", nome:"Dinheiro sujo ≥100k", meses:13, multa:12500, fianca:12500},
+      {num:"2.9", nome:"Itens ilegais", meses:19, multa:18750, fianca:18750},
+      {num:"2.10", nome:"Tráfico de drogas", meses:19, multa:18750, fianca:18750},
+      {num:"2.11", nome:"Munição ilegal", meses:19, multa:18750, fianca:18750}
+  ]},
+  {titulo:"CRIMES DE TRÂNSITO – ART. 1º", dados:[
+      {num:"1.1", nome:"Alta velocidade", meses:0, multa:3125, fianca:0},
+      {num:"1.2", nome:"Estacionar proibido", meses:0, multa:12500, fianca:0},
+      {num:"1.3", nome:"Abandono veículo", meses:0, multa:12500, fianca:0},
+      {num:"1.4", nome:"Fila dupla", meses:0, multa:12500, fianca:0},
+      {num:"1.5", nome:"Som alto", meses:0, multa:12500, fianca:0},
+      {num:"1.6", nome:"Bloquear via", meses:0, multa:12500, fianca:0},
+      {num:"1.7", nome:"Manobras perigosas", meses:6, multa:12500, fianca:12500},
+      {num:"1.8", nome:"Direção perigosa", meses:6, multa:12500, fianca:12500},
+      {num:"1.9", nome:"Dirigir sob efeito", meses:6, multa:12500, fianca:12500}
+  ]},
+  {titulo:"CRIMES INAFIANÇÁVEIS – ART. 4º", dados:[
+      {num:"4.1", nome:"Sequestro", meses:50, multa:50000, fianca:50000},
+      {num:"4.2", nome:"Porte arma alto calibre", meses:50, multa:50000, fianca:50000},
+      {num:"4.3", nome:"Tráfico de armas", meses:50, multa:50000, fianca:50000},
+      {num:"4.4", nome:"Tráfico de munições", meses:50, multa:50000, fianca:50000},
+      {num:"4.5", nome:"Desacato servidor público", meses:50, multa:50000, fianca:50000},
+      {num:"4.6", nome:"Abuso de poder", meses:63, multa:62500, fianca:62500},
+      {num:"4.7", nome:"Assalto banco/joalheria", meses:75, multa:75000, fianca:75000},
+      {num:"4.8", nome:"Corrupção passiva", meses:75, multa:75000, fianca:75000},
+      {num:"4.9", nome:"Latrocínio", meses:75, multa:75000, fianca:75000},
+      {num:"4.10", nome:"Homicídio doloso", meses:75, multa:75000, fianca:75000}
+  ]}
+];
+
+const crimesDiv = document.getElementById("crimesContainer");
+categorias.forEach((cat,ci)=>{
+  let html=`<div class="categoria"><h3>${cat.titulo}</h3>`;
+  cat.dados.forEach((c,i)=>{
+    html+=`<div class="crime">
+      <input type="checkbox" onchange="calcular()" data-cat="${ci}" data-i="${i}">
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <div style="font-weight:800; color:#eaf2ff;">${c.num} - ${c.nome}</div>
+        <div style="font-size:12px; color:rgba(226,232,240,.70);">Pena base: ${c.meses} meses</div>
+      </div>
+    </div>`;
+  });
+  html+="</div>";
+  crimesDiv.innerHTML+=html;
+});
+
+function unico(el){
+  document.getElementsByName(el.name).forEach(x=>{ if(x!==el) x.checked=false; });
+}
+
+function calcular(){
+  let meses=0,multa=0,fianca=0;
+  document.querySelectorAll('#crimesContainer input:checked').forEach(el=>{
+    let c=categorias[el.dataset.cat].dados[el.dataset.i];
+    meses+=c.meses; multa+=c.multa; fianca+=c.fianca;
+  });
+
+  let red=0;
+  if(document.querySelector('[name=reu][value=sim]')?.checked) red+=0.05;
+  if(document.querySelector('[name=bom][value=sim]')?.checked) red+=0.10;
+  if(document.querySelector('[name=ficha][value=sim]')?.checked) red+=0.05;
+
+  meses=Math.round(meses-(meses*red));
+  document.getElementById("meses").innerText=meses;
+  document.getElementById("multa").innerText=multa;
+  document.getElementById("fianca").innerText=fianca;
+  document.getElementById("total").innerText=multa+fianca;
+}
+
+function limparNomeArquivo(str){
+  return String(str || "SEM_NOME")
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[\\/:*?"<>|]/g, "")
+    .replace(/[^\p{L}\p{N}_-]+/gu, "")
+    .slice(0, 80);
+}
+
+async function esperarImagensDentro(el){
+  const imgs = Array.from(el.querySelectorAll("img"));
+  await Promise.all(imgs.map(img => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+  }));
+}
+
+function fecharRelatorio(){
+  document.getElementById('modalOverlay').style.display='none';
+}
+
+/* loading */
+function iniciarLoading5s(){
+  const panel = document.getElementById("loadingPanel");
+  const status = document.getElementById("loadingStatus");
+  const bar = document.getElementById("progressBar");
+  const done = document.getElementById("loadingDone");
+
+  panel.style.display = "block";
+  done.style.display = "none";
+  status.textContent = "carregando dados";
+  bar.style.width = "0%";
+
+  const totalMs = 5000;
+  const stalls = [{ at: 63, duration: 180 }, { at: 79, duration: 140 }];
+  let stallUntil = 0, stallIndex = 0;
+
+  const clamp01 = (v)=>Math.max(0, Math.min(1, v));
+  const lerp = (a,b,t)=>a+(b-a)*t;
+
+  function progressCurve(t){
+    t = clamp01(t);
+    if(t < 0.22){
+      const u = t / 0.22;
+      const e = 1 - Math.pow(1 - u, 3);
+      return lerp(0, 0.55, e);
+    }
+    if(t < 0.85){
+      const u = (t - 0.22) / (0.85 - 0.22);
+      const e = -(Math.cos(Math.PI * u) - 1) / 2;
+      return lerp(0.55, 0.90, e);
+    }
+    const u = (t - 0.85) / (1 - 0.85);
+    const e = Math.pow(u, 3);
+    return lerp(0.90, 1.0, e);
+  }
+
+  return new Promise(resolve=>{
+    const start = performance.now();
+    function frame(now){
+      const elapsed = now - start;
+      const t = elapsed / totalMs;
+
+      if(now < stallUntil){
+        requestAnimationFrame(frame);
+        return;
+      }
+
+      let pct = Math.round(progressCurve(t) * 100);
+      pct = Math.min(100, Math.max(0, pct));
+
+      if(stallIndex < stalls.length && pct >= stalls[stallIndex].at){
+        stallUntil = now + stalls[stallIndex].duration;
+        stallIndex++;
+      }
+
+      bar.style.width = pct + "%";
+
+      if(pct < 38) status.textContent = "carregando dados";
+      else if(pct < 88) status.textContent = "registrando";
+      else status.textContent = "finalizando";
+
+      if(elapsed >= totalMs || pct >= 100){
+        bar.style.width = "100%";
+        status.textContent = "registro feito com sucesso";
+        done.style.display = "block";
+        resolve();
+        return;
+      }
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+/* histórico */
+function historyKeyById(id){
+  const clean = String(id || "").trim();
+  return clean ? `HISTORICO_INFRATOR_${clean}` : null;
+}
+function loadHistoryById(id){
+  const key = historyKeyById(id);
+  if(!key) return [];
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return [];
+  }
+}
+function saveHistoryById(id, records){
+  const key = historyKeyById(id);
+  if(!key) return;
+  try{ localStorage.setItem(key, JSON.stringify(records)); }catch(e){}
+}
+function getSelectedCrimes(){
+  const arr = [];
+  document.querySelectorAll('#crimesContainer input:checked').forEach(el=>{
+    const c = categorias[el.dataset.cat].dados[el.dataset.i];
+    arr.push({ num:c.num, nome:c.nome, meses:c.meses });
+  });
+  return arr;
+}
+function renderHistory(id){
+  const list = document.getElementById("historyList");
+  const badge = document.getElementById("historyBadge");
+  const cleanId = String(id || "").trim();
+
+  if(!cleanId){
+    badge.textContent = `ID: — | Registros: 0`;
+    list.innerHTML = `<div class="hEmpty">Digite o ID do infrator para puxar o histórico automaticamente.</div>`;
+    return;
+  }
+
+  const records = loadHistoryById(cleanId);
+  badge.textContent = `ID: ${cleanId} | Registros: ${records.length}`;
+
+  if(records.length === 0){
+    list.innerHTML = `<div class="hEmpty">Nenhum registro encontrado para este ID.</div>`;
+    return;
+  }
+
+  list.innerHTML = records.map(r=>{
+    const crimesTxt = (r.crimes || []).map(x=>`${x.num} - ${x.nome} (${x.meses}m)`).join(" | ");
+    return `
+      <div class="hItem">
+        <div class="hRow">
+          <div><strong>${r.dataHora}</strong></div>
+          <div>• Protocolo: <strong>${r.protocolo}</strong></div>
+          <div>• Meses: <strong>${r.meses}</strong></div>
+          <div>• Total: <strong>$${r.total}</strong></div>
+        </div>
+        <div class="hMeta">
+          <div><strong>Policial:</strong> ${r.policial} (${r.idPolicial})</div>
+          <div><strong>Organização:</strong> ${r.organizacao}</div>
+          <div class="hMiniTitle">Infrações</div>
+          <div>${crimesTxt || "Nenhuma infração registrada."}</div>
+          ${r.obs ? `<div class="hMiniTitle">Observações</div><div>${String(r.obs).replace(/</g,"&lt;")}</div>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+function addRecordToHistory(idInfrator, record){
+  const cleanId = String(idInfrator || "").trim();
+  if(!cleanId) return;
+  const records = loadHistoryById(cleanId);
+  records.unshift(record);
+  saveHistoryById(cleanId, records.slice(0, 20));
+  renderHistory(cleanId);
+}
+document.getElementById("idsuspeito").addEventListener("input", (e)=>{
+  renderHistory(e.target.value);
+});
+
+/* relatório */
+async function gerarRelatorio(){
+  document.getElementById("btnAplicar").style.display="none";
+  await iniciarLoading5s();
+
+  const nomePolicial = (document.getElementById("policial").value || "").trim();
+  const idPolicial = (document.getElementById("idpolicial").value || "").trim();
+  const nomeInfrator = (document.getElementById("suspeito").value || "").trim();
+  const idInfrator = (document.getElementById("idsuspeito").value || "").trim();
+  const organizacao = document.getElementById("organizacao").value;
+  const obs = (document.getElementById("obs").value || "").trim();
+
+  const protocolo = "PROT-" + Math.floor(100000 + Math.random() * 900000);
+  const now = new Date();
+  const dataHora = now.toLocaleString('pt-BR', {hour12:false});
+
+  const crimesSelecionados = getSelectedCrimes();
+  addRecordToHistory(idInfrator, {
+    protocolo, dataHora,
+    policial: nomePolicial || "—",
+    idPolicial: idPolicial || "—",
+    infrator: nomeInfrator || "—",
+    idInfrator: idInfrator || "—",
+    organizacao: organizacao || "—",
+    meses: document.getElementById("meses").innerText,
+    multa: document.getElementById("multa").innerText,
+    fianca: document.getElementById("fianca").innerText,
+    total: document.getElementById("total").innerText,
+    crimes: crimesSelecionados,
+    obs
+  });
+
+  document.getElementById("dados").innerHTML = `
+    <div class="linha"><strong>Policial:</strong> ${nomePolicial} (${idPolicial})</div>
+    <div class="linha"><strong>Infrator:</strong> ${nomeInfrator} (${idInfrator})</div>
+    <div class="linha"><strong>Organização:</strong> ${organizacao}</div>
+    <div class="linha totalBox">Meses: ${document.getElementById("meses").innerText} | Multa: $${document.getElementById("multa").innerText} | Fiança: $${document.getElementById("fianca").innerText} | Total: $${document.getElementById("total").innerText}</div>
+  `;
+
+  let lista="";
+  crimesSelecionados.forEach(c=>{
+    lista+=`<div class="linha">${c.num} - ${c.nome} (${c.meses} meses)</div>`;
+  });
+  document.getElementById("listaCrimes").innerHTML = lista || `<div class="linha">Nenhuma infração marcada.</div>`;
+  document.getElementById("observacaoFinal").innerText = obs || "Sem observações.";
+
+  document.getElementById("protocolo").innerText = protocolo;
+  document.getElementById("dataHora").innerText = dataHora;
+
+  const termo = `Eu, ${nomePolicial} portador do documento (${idPolicial}), na qualidade de policial responsável pelo procedimento, registro que o(a) indivíduo ${nomeInfrator}, portador do documento (${idInfrator}), foi devidamente submetido(a) às medidas legais cabíveis conforme a legislação vigente da cidade de Maringá.
+
+O presente relatório possui caráter oficial e administrativo, sendo firmado para fins de registro e controle interno.
+
+${dataHora}`;
+  document.getElementById("termoTexto").innerText = termo;
+
+  document.getElementById("modalOverlay").style.display = "flex";
+
+  const resultadoDiv = document.getElementById("resultadoFinal");
+  resultadoDiv.classList.add("capturando");
+
+  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
+  await esperarImagensDentro(resultadoDiv);
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  const scale = Math.max(2.5, (window.devicePixelRatio || 1) * 2);
+
+  try{
+    const canvas = await html2canvas(resultadoDiv, {
+      backgroundColor: "#ffffff",
+      scale,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      imageTimeout: 15000,
+      windowWidth: resultadoDiv.scrollWidth,
+      windowHeight: resultadoDiv.scrollHeight
+    });
+
+    canvas.toBlob(async function(blob){
+      if(!blob){
+        alert("Falha ao gerar a imagem do relatório.");
+        return;
+      }
+
+      const suspeito = limparNomeArquivo(nomeInfrator);
+      const idsus = limparNomeArquivo(idInfrator);
+      const nomeArquivo = `${suspeito}_${idsus}.png`;
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = nomeArquivo;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+
+      const formData = new FormData();
+      formData.append("file", blob, nomeArquivo);
+      formData.append("payload_json", JSON.stringify({
+        content: `Relatório Penal - ${nomeArquivo}\nProtocolo: ${protocolo} | Data/Hora: ${dataHora}`
+      }));
+
+      try{
+        const res = await fetch(DISCORD_WEBHOOK, { method:"POST", body: formData });
+        if(!res.ok) console.warn("Discord respondeu erro:", res.status);
+      }catch(err){
+        console.warn("Erro ao enviar pro Discord:", err);
+      }
+    }, "image/png", 1.0);
+
+  } finally {
+    resultadoDiv.classList.remove("capturando");
+  }
+}
+
+renderHistory(document.getElementById("idsuspeito").value);
+</script>
+
+</body>
+</html>
